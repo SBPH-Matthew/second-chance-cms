@@ -14,8 +14,11 @@ import {
 } from "@carbon/react";
 import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
+import { useRegister } from "./hooks";
 
 export const Register = () => {
+    const { mutateAsync: RegisterPOST, isPending } = useRegister();
+
     const form = useForm({
         defaultValues: {
             first_name: "",
@@ -25,7 +28,12 @@ export const Register = () => {
             confirm_password: "",
         },
         onSubmit: async ({ value }) => {
-            console.log(value);
+            RegisterPOST(value, {
+                onSuccess: (data) => {
+                    console.log("data", data);
+                },
+                onError: (err) => console.log(err),
+            });
         },
     });
 
@@ -67,10 +75,10 @@ export const Register = () => {
                                     <form.Field
                                         name="first_name"
                                         validators={{
-                                            onChange: ({ value }) =>
-                                                !value
-                                                    ? "First name is required"
-                                                    : undefined,
+                                            onChange: ({ value }) => {
+                                                if (!value)
+                                                    return "First name is required.";
+                                            },
                                         }}
                                     >
                                         {(field) => (
@@ -101,7 +109,7 @@ export const Register = () => {
                                         validators={{
                                             onChange: ({ value }) =>
                                                 !value
-                                                    ? "Last name is required"
+                                                    ? "Last name is required."
                                                     : undefined,
                                         }}
                                     >
@@ -111,6 +119,7 @@ export const Register = () => {
                                                 labelText="Last Name"
                                                 className="w-1/2"
                                                 name={field.name}
+                                                onBlur={field.handleBlur}
                                                 onChange={(e) =>
                                                     field.handleChange(
                                                         e.target.value,
@@ -142,9 +151,16 @@ export const Register = () => {
                                                 id="email"
                                                 type="email"
                                                 labelText="Email"
+                                                name={field.name}
+                                                onBlur={field.handleBlur}
                                                 value={field.state.value}
+                                                onChange={(e) =>
+                                                    field.handleChange(
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 invalid={
-                                                    !field.state.meta.errors
+                                                    !field.state.meta.isValid
                                                 }
                                                 invalidText={field.state.meta.errors.join(
                                                     ", ",
@@ -155,32 +171,87 @@ export const Register = () => {
                                 </div>
 
                                 <div className="w-full flex gap-4">
-                                    <PasswordInput
-                                        id="password"
-                                        labelText="Password"
-                                        className="w-full md:w-1/2"
-                                        size="lg"
-                                    />
+                                    <form.Field
+                                        name="password"
+                                        validators={{
+                                            onChange: ({ value }) =>
+                                                !value
+                                                    ? "Password is required."
+                                                    : undefined,
+                                        }}
+                                    >
+                                        {(field) => (
+                                            <PasswordInput
+                                                id="password"
+                                                labelText="Password"
+                                                className="w-full md:w-1/2"
+                                                size="lg"
+                                                name={field.name}
+                                                onBlur={field.handleBlur}
+                                                value={field.state.value}
+                                                onChange={(e) =>
+                                                    field.handleChange(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                invalid={
+                                                    !field.state.meta.isValid
+                                                }
+                                                invalidText={field.state.meta.errors.join(
+                                                    ", ",
+                                                )}
+                                            />
+                                        )}
+                                    </form.Field>
 
-                                    <PasswordInput
-                                        id="confirm_password"
-                                        labelText="Confirm Password"
-                                        className="w-full md:w-1/2"
-                                        size="lg"
-                                    />
+                                    <form.Field
+                                        name="confirm_password"
+                                        validators={{
+                                            onChange: ({ value }) =>
+                                                !value
+                                                    ? "Confirm password is required."
+                                                    : undefined,
+                                        }}
+                                    >
+                                        {(field) => (
+                                            <PasswordInput
+                                                id="confirm_password"
+                                                labelText="Confirm Password"
+                                                className="w-full md:w-1/2"
+                                                size="lg"
+                                                name={field.name}
+                                                onBlur={field.handleBlur}
+                                                value={field.state.value}
+                                                onChange={(e) =>
+                                                    field.handleChange(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                invalid={
+                                                    !field.state.meta.isValid
+                                                }
+                                                invalidText={field.state.meta.errors.join(
+                                                    ", ",
+                                                )}
+                                            />
+                                        )}
+                                    </form.Field>
                                 </div>
 
-                                <InlineLoading
-                                    description="Loading"
-                                    iconDescription="Submitting form..."
-                                />
-                                <Button
-                                    type="submit"
-                                    title="register"
-                                    kind="primary"
-                                >
-                                    Register
-                                </Button>
+                                {isPending ? (
+                                    <InlineLoading
+                                        description="Loading"
+                                        iconDescription="Submitting form..."
+                                    />
+                                ) : (
+                                    <Button
+                                        type="submit"
+                                        title="register"
+                                        kind="primary"
+                                    >
+                                        Register
+                                    </Button>
+                                )}
                             </div>
                         </AccordionItem>
                         <AccordionItem
