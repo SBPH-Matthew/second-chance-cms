@@ -1,26 +1,36 @@
 {
-  "name": "second-chance-cms2",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "next": "16.1.0",
-    "react": "19.2.3",
-    "react-dom": "19.2.3"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.0",
-    "tailwindcss": "^4",
-    "typescript": "^5"
-  }
+    "name": "second-chance-cms2",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "eslint"
+    },
+    "dependencies": {
+        "@carbon/icons-react": "^11.71.0",
+        "@carbon/react": "^1.97.0",
+        "@carbon/styles": "^1.96.0",
+        "@carbon/type": "^11.50.0",
+        "@ibm/plex": "^6.4.1",
+        "@tanstack/react-form": "^1.27.6",
+        "@tanstack/react-query": "^5.90.12",
+        "@tanstack/react-query-devtools": "^5.91.1",
+        "next": "16.1.0",
+        "react": "19.2.3",
+        "react-dom": "19.2.3",
+        "typescript-config-carbon": "^0.8.0"
+    },
+    "devDependencies": {
+        "@tailwindcss/postcss": "^4",
+        "@types/node": "^20",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "eslint": "^9",
+        "eslint-config-next": "16.1.0",
+        "sass": "^1.97.1",
+        "tailwindcss": "^4",
+        "typescript": "^5"
+    }
 }

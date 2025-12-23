@@ -1,0 +1,28 @@
+@use "@carbon/styles/scss/config" with (
+    $css--font-face: false
+);
+
+// 2. Now you can use the main packages
+@use "@carbon/react";
+@use "@carbon/type";
+
+:root {
+    // Map the Next.js font variables to Carbon's expected variables
+    // Note: Next.js variables include the font stack automatically
+    --cds-font-family-sans:
+        var(--cds-font-family-sans), "Helvetica Neue", Arial, sans-serif;
+    --cds-font-family-mono:
+        var(--cds-font-family-mono), "Courier New", monospace;
+}
+
+// Ensure Carbon's type system uses these variables
+html {
+    font-family: var(--cds-font-family-sans);
+}
+
+code,
+kbd,
+samp,
+pre {
+    font-family: var(--cds-font-family-mono);
+}
