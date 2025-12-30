@@ -32,8 +32,8 @@ export const Login = () => {
   const onSubmit = (data: LoginRequestType) => {
     console.log("submit");
     loginPOST(data, {
-      onSuccess: () => {
-        console.log("success");
+      onSuccess: (data) => {
+        console.log("success", data);
         router.push("/dashboard"); // or wherever you want to redirect
       },
       onError: (error) => {
@@ -108,7 +108,7 @@ export const Login = () => {
       </Form>
 
       <div className="pt-5! px-16! flex flex-col gap-4">
-        <p className="text-sm! text-[#e0e0e0]">Don't have an account?</p>
+        <p className="text-sm! text-[#e0e0e0]">{`Don't have an account?`}</p>
         <Button
           kind="primary"
           className="w-1/2!"

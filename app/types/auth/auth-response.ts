@@ -24,7 +24,7 @@ export interface LoginResponseType {
 
 export interface LoginErrorType {
   message?: string;
-  errors?: {
+  errors: {
     email?: string;
     password?: string;
   };

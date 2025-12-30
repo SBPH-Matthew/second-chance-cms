@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const LoginRequestSchema = z.object({
-  email: z.email({ message: "Email is invalid." }),
+  email: z.email({ message: "Email is required." }),
   password: z
     .string({ message: "Password is required." })
     .min(8, { message: "Password must be at least 8 characters." }),
@@ -17,7 +17,7 @@ export const RegisterRequestSchema = z
     last_name: z
       .string({ message: "Last name is required." })
       .min(1, { message: "Last name is required." }),
-    email: z.email({ message: "Email is invalid." }),
+    email: z.email({ message: "Email is required." }),
     password: z
       .string({ message: "Password is required." })
       .min(8, { message: "Password must be at least 8 characters." }),
