@@ -4,54 +4,58 @@ import {
   CreateCategoryResponse,
   GetCategoryGroupsResponse,
   GetCategoryStatusesResponse,
-  ServerValidationErrors,
+  SetCategoryStatusRequest,
 } from "@/app/types";
 
-export const getCategoryGroups =
-  async (): Promise<GetCategoryGroupsResponse> => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API}/category-group/`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
+export const getCategoryGroups = async (
+  signal?: AbortSignal,
+): Promise<GetCategoryGroupsResponse> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/category-group/`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      credentials: "include",
+      signal,
+    },
+  );
 
-    const data = await response.json();
-    if (!response.ok) {
-      throw data;
-    }
+  const data = await response.json();
+  if (!response.ok) {
+    throw data;
+  }
 
-    return data;
-  };
+  return data;
+};
 
-export const getCategoryStatuses =
-  async (): Promise<GetCategoryStatusesResponse> => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API}/category-status/`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
+export const getCategoryStatuses = async (
+  signal?: AbortSignal,
+): Promise<GetCategoryStatusesResponse> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/category-status/`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      credentials: "include",
+      signal,
+    },
+  );
 
-    const data = await response.json();
-    if (!response.ok) {
-      throw data;
-    }
+  const data = await response.json();
+  if (!response.ok) {
+    throw data;
+  }
 
-    return data;
-  };
+  return data;
+};
 
 export const createCategory = async (
   payload: CreateCategoryRequest,
-): Promise<CreateCategoryResponse | ServerValidationErrors> => {
+): Promise<CreateCategoryResponse> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API}/category/`, {
     method: "POST",
     headers: {
@@ -64,7 +68,7 @@ export const createCategory = async (
   const data = await response.json();
 
   if (!response.ok) {
-    throw data as ServerValidationErrors;
+    throw data;
   }
 
   return data;
@@ -92,7 +96,7 @@ export const updateCategory = async ({
   const data = await response.json();
 
   if (!response.ok) {
-    throw data as ServerValidationErrors;
+    throw data;
   }
 
   return data;
@@ -118,6 +122,52 @@ export const paginateCategories = async ({
       },
       credentials: "include",
       signal,
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw data;
+  }
+
+  return data;
+};
+
+export const deleteCategory = async (id: number) => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/category/${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw data;
+  }
+
+  return data;
+};
+
+export const setCategoryStatus = async ({
+  id,
+  status,
+}: SetCategoryStatusRequest) => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/category/${id}/status`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ status }),
     },
   );
 

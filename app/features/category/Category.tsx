@@ -7,6 +7,7 @@ import {
   Modal,
   OverflowMenu,
   OverflowMenuItem,
+  Pagination,
   Select,
   SelectItem,
   SelectSkeleton,
@@ -29,14 +30,16 @@ import { useForm } from "react-hook-form";
 import {
   CreateCategoryRequest,
   CreateCategorySchema,
-  ServerValidationErrors,
+  ValidationResponse,
 } from "@/app/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useCreateCategory,
+  useDeleteCategory,
   useGetCategoryGroups,
   useGetCategoryStatuses,
   usePaginateCategories,
+  useSetCategoryStatus,
   useUpdateCategory,
 } from "./hooks";
 import { useModalLoading } from "@/app/hooks";
@@ -47,7 +50,12 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export const Category = () => {
   const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [open, setOpen] = useState(false);
+  const [dangerModalOpen, setDangerModalOpen] = useState(false);
+  const [statusModal, setStatusModal] = useState(false);
+  const [statusValue, setStatusValue] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const { data: categoryGroups, isPending: loadingCategoryGroups } =
     useGetCategoryGroups();
@@ -55,9 +63,24 @@ export const Category = () => {
     useGetCategoryStatuses();
   const { data: paginateCategories, isPending: loadingPaginateCategories } =
     usePaginateCategories({
-      page: 1,
-      limit: 10,
+      page: page,
+      limit: pageSize,
     });
+  const {
+    mutateAsync: deleteCategory,
+    isPending: isDeleting,
+    isSuccess: successDelete,
+    isError: errorDelete,
+    reset: resetDelete,
+  } = useDeleteCategory();
+  const {
+    mutateAsync: SetCategoryStatus,
+    isPending: isSettingStatus,
+    isSuccess: statusSuccess,
+    isError: statusError,
+  } = useSetCategoryStatus();
+
+  const isEmpty = paginateCategories?.categories.total === 0;
 
   const {
     mutateAsync: CreateCategory,
@@ -75,11 +98,22 @@ export const Category = () => {
     reset: resetUpdate,
   } = useUpdateCategory();
 
-  // 2. Combine them for the hook
   const { status } = useModalLoading({
     loading: isCreating || isUpdating,
     success: createSuccess || updateSuccess,
     error: createError || updateError,
+  });
+
+  const { status: deleteStatus } = useModalLoading({
+    loading: isDeleting,
+    success: successDelete,
+    error: errorDelete,
+  });
+
+  const { status: changeStatusPending } = useModalLoading({
+    loading: isSettingStatus,
+    success: statusSuccess,
+    error: statusError,
   });
 
   const handleModal = () => {
@@ -114,11 +148,12 @@ export const Category = () => {
     mutationProvider
       .then(() => {
         setTimeout(() => {
-          // 1. Reset the form fields
+          setPage(1);
+
           form.reset({ name: "", category_group: "", status: "" });
-          // 2. Clear the ID and close modal
+
           handleModal();
-          // 3. Reset the mutation states (important for useModalLoading)
+
           resetCreate();
           resetUpdate();
           queryClient.invalidateQueries({
@@ -126,17 +161,72 @@ export const Category = () => {
           });
         }, 500);
       })
-      .catch((error: any) => {
-        if (error?.errors) {
-          const serverErrors = error?.errors as ServerValidationErrors;
+      .catch((error: ValidationResponse) => {
+        if (error.errors) {
+          const serverErrors = error.errors;
           Object.entries(serverErrors).forEach(([field, message]) => {
             setError(field as keyof CreateCategoryRequest, {
               type: "server",
-              message: message,
+              message: message ?? "Error",
             });
           });
         }
       });
+  };
+
+  const handleDeleteModal = () => {
+    if (selectedCategory) {
+      setSelectedCategory(null);
+    }
+    setDangerModalOpen((prev) => !prev);
+  };
+
+  const handleStatusModal = () => {
+    if (selectedCategory) {
+      setSelectedCategory(null);
+    }
+    setStatusModal((prev) => !prev);
+  };
+
+  const handleDelete = () => {
+    if (selectedCategory) {
+      deleteCategory(selectedCategory, {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ["paginate-categories"],
+          });
+          setTimeout(() => {
+            setPage(1);
+            resetDelete();
+            handleDeleteModal();
+          }, 500);
+        },
+        onError: (error) => {
+          console.error("Error deleting category:", error);
+        },
+      });
+    }
+  };
+
+  const handleChangeStatus = () => {
+    if (!statusValue) return;
+    if (selectedCategory) {
+      SetCategoryStatus(
+        {
+          id: selectedCategory,
+          status: statusValue,
+        },
+        {
+          onSuccess: () => {
+            setPage(1);
+            queryClient.invalidateQueries({
+              queryKey: ["paginate-categories"],
+            });
+            handleStatusModal();
+          },
+        },
+      );
+    }
   };
 
   return (
@@ -205,6 +295,43 @@ export const Category = () => {
         </Form>
       </Modal>
 
+      <Modal
+        open={dangerModalOpen}
+        aria-label="Delete category"
+        modalLabel="Category resources"
+        modalHeading="Are you sure you want to delete this category?"
+        danger
+        primaryButtonText="Delete"
+        secondaryButtonText="Cancel"
+        size="md"
+        onRequestClose={handleDeleteModal}
+        loadingStatus={deleteStatus}
+        loadingDescription="Deleting..."
+        onRequestSubmit={handleDelete}
+      >
+        <p>
+          Check for dependencies on the products before deletion. For instance,
+          if a product is assigned to this category, those products will need to
+          be removed or reconfigured first.
+        </p>
+      </Modal>
+
+      <Modal
+        open={statusModal}
+        aria-label="Update status"
+        modalLabel="Category resources"
+        modalHeading="Are you sure you want to update this category status?"
+        primaryButtonText="Save"
+        secondaryButtonText="Cancel"
+        size="md"
+        onRequestClose={handleStatusModal}
+        loadingStatus={changeStatusPending}
+        loadingDescription="Updating..."
+        onRequestSubmit={handleChangeStatus}
+      >
+        <p>Are you sure you want to change the status of this category?</p>
+      </Modal>
+
       {loadingPaginateCategories ? (
         <DataTableSkeleton
           aria-label="Category table"
@@ -215,6 +342,7 @@ export const Category = () => {
           ]}
           showHeader
           showToolbar
+          columnCount={3}
         />
       ) : (
         <TableContainer
@@ -246,57 +374,119 @@ export const Category = () => {
               </Button>
             </TableToolbarContent>
           </TableToolbar>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeader>Category Name</TableHeader>
-                <TableHeader>Category Status</TableHeader>
-                <TableHeader>Actions</TableHeader>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginateCategories?.categories.items.map((items, index) => (
-                <TableRow key={index}>
-                  <TableCell>{items.name}</TableCell>
-                  <TableCell>
-                    <CarbonLink as={Link} href="#">
-                      {
-                        CategoryStatusConst[
-                          items.status as keyof typeof CategoryStatusConst
-                        ]
-                      }
-                    </CarbonLink>
-                  </TableCell>
-                  <TableCell>
-                    <OverflowMenu
-                      aria-label="actions"
-                      renderIcon={OverflowMenuHorizontal}
-                      flipped
-                    >
-                      <OverflowMenuItem
-                        itemText="Edit"
-                        onClick={() => {
-                          setSelectedCategory(items.id);
+          {isEmpty ? (
+            <div className="flex flex-col items-start justify-center py-16 gap-4 ps-5! pt-5!">
+              <h3 className="text-xl font-semibold">No categories yet</h3>
+              <p className="text-gray-500 max-w-md">
+                Categories help organize your products. Create your first
+                category to get started.
+              </p>
+              <Button renderIcon={Add} onClick={handleModal}>
+                Add Category
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeader>Category Name</TableHeader>
+                    <TableHeader>Category Status</TableHeader>
+                    <TableHeader>Actions</TableHeader>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginateCategories?.categories.items.map((items, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{items.name}</TableCell>
+                      <TableCell>
+                        <CarbonLink as={Link} href="#">
+                          {
+                            CategoryStatusConst[
+                              items.status as keyof typeof CategoryStatusConst
+                            ]
+                          }
+                        </CarbonLink>
+                      </TableCell>
+                      <TableCell>
+                        <OverflowMenu
+                          aria-label="actions"
+                          renderIcon={OverflowMenuHorizontal}
+                          flipped
+                        >
+                          <OverflowMenuItem
+                            itemText="Edit"
+                            onClick={() => {
+                              setSelectedCategory(items.id);
 
-                          form.reset({
-                            name: items.name,
-                            category_group: items.category_group.toString(),
-                            status: items.status.toString(),
-                          });
+                              form.reset({
+                                name: items.name,
+                                category_group: items.category_group.toString(),
+                                status: items.status.toString(),
+                              });
 
-                          setOpen(true);
-                        }}
-                      />
-                      <OverflowMenuItem hasDivider itemText="Set Active" />
-                      <OverflowMenuItem itemText="Set Inactive" />
-                      <OverflowMenuItem itemText="Set Draft" />
-                      <OverflowMenuItem hasDivider itemText="Delete" isDelete />
-                    </OverflowMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                              setOpen(true);
+                            }}
+                          />
+                          <OverflowMenuItem
+                            hasDivider
+                            itemText="Set Active"
+                            disabled={items.status === 1}
+                            onClick={() => {
+                              setSelectedCategory(items.id);
+                              setStatusValue(1);
+                              handleStatusModal();
+                            }}
+                          />
+                          <OverflowMenuItem
+                            itemText="Set Inactive"
+                            disabled={items.status === 2}
+                            onClick={() => {
+                              setSelectedCategory(items.id);
+                              setStatusValue(2);
+                              handleStatusModal();
+                            }}
+                          />
+                          <OverflowMenuItem
+                            disabled={items.status === 3}
+                            itemText="Set Draft"
+                            onClick={() => {
+                              setSelectedCategory(items.id);
+                              setStatusValue(3);
+                              handleStatusModal();
+                            }}
+                          />
+                          <OverflowMenuItem
+                            hasDivider
+                            itemText="Delete"
+                            isDelete
+                            onClick={() => {
+                              setSelectedCategory(items.id);
+
+                              handleDeleteModal();
+                            }}
+                          />
+                        </OverflowMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <Pagination
+                backwardText="Previous page"
+                forwardText="Next page"
+                itemsPerPageText="Items per page:"
+                page={page}
+                pageSize={pageSize}
+                pageSizes={[10, 20, 30, 40, 50]}
+                totalItems={paginateCategories?.categories.total || 0} // Ensure your API returns the total count
+                onChange={({ page, pageSize }) => {
+                  setPage(page);
+                  setPageSize(pageSize);
+                }}
+              />
+            </>
+          )}
         </TableContainer>
       )}
     </section>

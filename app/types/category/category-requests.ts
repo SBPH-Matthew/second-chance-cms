@@ -14,3 +14,10 @@ export const CreateCategorySchema = z.object({
 });
 
 export type CreateCategoryRequest = z.infer<typeof CreateCategorySchema>;
+
+export const SetCategoryStatusSchema = z.object({
+  id: z.number({ message: "Invalid ID" }),
+  status: z.number({ message: "Invalid status" }),
+});
+
+export type SetCategoryStatusRequest = z.infer<typeof SetCategoryStatusSchema>;

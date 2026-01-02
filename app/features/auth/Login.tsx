@@ -8,7 +8,7 @@ import {
   TextInput,
   Theme,
 } from "@carbon/react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginRequestSchema, LoginRequestType } from "@/app/types";
 import { useLogin } from "./hooks";
@@ -20,10 +20,10 @@ export const Login = () => {
   const router = useRouter();
 
   const {
-    control,
     handleSubmit,
     formState: { errors },
     setError,
+    register,
   } = useForm<LoginRequestType>({
     resolver: zodResolver(LoginRequestSchema),
     mode: "all",
@@ -63,37 +63,25 @@ export const Login = () => {
           <p className="text-sm!">Enter your login credentials below.</p>
         </div>
 
-        <Controller
-          name="email"
-          control={control}
-          render={({ field }) => (
-            <TextInput
-              {...field}
-              id="email"
-              type="email"
-              labelText="Email"
-              size="lg"
-              helperText="Enter your registered email."
-              invalid={!!errors.email}
-              invalidText={errors.email?.message}
-            />
-          )}
+        <TextInput
+          {...register("email")}
+          id="email"
+          type="email"
+          labelText="Email"
+          size="lg"
+          helperText="Enter your registered email."
+          invalid={!!errors.email}
+          invalidText={errors.email?.message}
         />
 
-        <Controller
-          name="password"
-          control={control}
-          render={({ field }) => (
-            <PasswordInput
-              {...field}
-              id="password"
-              labelText="Password"
-              size="lg"
-              helperText="Enter your password."
-              invalid={!!errors.password}
-              invalidText={errors.password?.message}
-            />
-          )}
+        <PasswordInput
+          {...register("password")}
+          id="password"
+          labelText="Password"
+          size="lg"
+          helperText="Enter your password."
+          invalid={!!errors.password}
+          invalidText={errors.password?.message}
         />
 
         {isPending ? (

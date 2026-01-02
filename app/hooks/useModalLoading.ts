@@ -4,7 +4,7 @@ interface UseModalLoadingProps {
   error: boolean;
 }
 
-export type ModalLoadingStatus = "inactive" | "active" | "finished";
+export type ModalLoadingStatus = "inactive" | "active" | "finished" | "error";
 
 export const useModalLoading = ({
   loading,
@@ -19,7 +19,7 @@ export const useModalLoading = ({
   } else if (success) {
     status = "finished";
   } else if (error) {
-    status = "inactive";
+    status = "error";
   }
 
   return { status };

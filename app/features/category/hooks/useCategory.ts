@@ -1,17 +1,26 @@
 import {
   createCategory,
+  deleteCategory,
   getCategoryGroups,
   getCategoryStatuses,
   paginateCategories,
   PaginateCategoriesParams,
+  setCategoryStatus,
   updateCategory,
 } from "@/app/services";
+import {
+  CreateCategoryRequest,
+  CreateCategoryResponse,
+  ResponseType,
+  SetCategoryStatusRequest,
+  ValidationResponse,
+} from "@/app/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useGetCategoryGroups = () => {
   const { data, isPending, error } = useQuery({
     queryKey: ["category-groups"],
-    queryFn: getCategoryGroups,
+    queryFn: ({ signal }) => getCategoryGroups(signal),
   });
 
   return { data, isPending, error };
@@ -20,21 +29,29 @@ export const useGetCategoryGroups = () => {
 export const useGetCategoryStatuses = () => {
   const { data, isPending, error } = useQuery({
     queryKey: ["category-statuses"],
-    queryFn: getCategoryStatuses,
+    queryFn: ({ signal }) => getCategoryStatuses(signal),
   });
 
   return { data, isPending, error };
 };
 
 export const useCreateCategory = () => {
-  return useMutation({
+  return useMutation<
+    CreateCategoryResponse,
+    ValidationResponse,
+    CreateCategoryRequest
+  >({
     mutationKey: ["create-category"],
     mutationFn: createCategory,
   });
 };
 
 export const useUpdateCategory = () => {
-  return useMutation({
+  return useMutation<
+    CreateCategoryResponse,
+    ValidationResponse,
+    { id: number; payload: CreateCategoryRequest }
+  >({
     mutationKey: ["update-category"],
     mutationFn: updateCategory,
   });
@@ -51,4 +68,22 @@ export const usePaginateCategories = ({
   });
 
   return { data, isPending, error };
+};
+
+export const useDeleteCategory = () => {
+  return useMutation({
+    mutationKey: ["delete-category"],
+    mutationFn: deleteCategory,
+  });
+};
+
+export const useSetCategoryStatus = () => {
+  return useMutation<
+    ResponseType,
+    ValidationResponse,
+    SetCategoryStatusRequest
+  >({
+    mutationKey: ["set-category-status"],
+    mutationFn: setCategoryStatus,
+  });
 };

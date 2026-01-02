@@ -14,7 +14,7 @@ import {
 } from "@carbon/react";
 import Link from "next/link";
 import { useRegister } from "./hooks";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterRequestSchema, RegisterRequestType } from "@/app/types";
 import { useRouter } from "next/navigation";
@@ -23,10 +23,10 @@ export const Register = () => {
   const { mutateAsync: registerPOST, isPending } = useRegister();
   const router = useRouter();
   const {
-    control,
     handleSubmit,
     formState: { errors },
     setError,
+    register,
   } = useForm({
     resolver: zodResolver(RegisterRequestSchema),
     mode: "all",
@@ -81,83 +81,53 @@ export const Register = () => {
               <div className="flex flex-col gap-4">
                 {/* First / Last name */}
                 <div className="flex gap-4">
-                  <Controller
-                    name="first_name"
-                    control={control}
-                    render={({ field }) => (
-                      <TextInput
-                        {...field}
-                        id="first_name"
-                        labelText="First Name"
-                        className="w-1/2"
-                        invalid={!!errors.first_name}
-                        invalidText={errors.first_name?.message}
-                      />
-                    )}
+                  <TextInput
+                    {...register("first_name")}
+                    id="first_name"
+                    labelText="First Name"
+                    className="w-1/2"
+                    invalid={!!errors.first_name}
+                    invalidText={errors.first_name?.message}
                   />
 
-                  <Controller
-                    name="last_name"
-                    control={control}
-                    render={({ field }) => (
-                      <TextInput
-                        {...field}
-                        id="last_name"
-                        labelText="Last Name"
-                        className="w-1/2"
-                        invalid={!!errors.last_name}
-                        invalidText={errors.last_name?.message}
-                      />
-                    )}
+                  <TextInput
+                    {...register("last_name")}
+                    id="last_name"
+                    labelText="Last Name"
+                    className="w-1/2"
+                    invalid={!!errors.last_name}
+                    invalidText={errors.last_name?.message}
                   />
                 </div>
 
                 {/* Email */}
-                <Controller
-                  name="email"
-                  control={control}
-                  render={({ field }) => (
-                    <TextInput
-                      {...field}
-                      id="email"
-                      type="email"
-                      labelText="Email"
-                      invalid={!!errors.email}
-                      invalidText={errors.email?.message}
-                    />
-                  )}
+                <TextInput
+                  {...register("email")}
+                  id="email"
+                  type="email"
+                  labelText="Email"
+                  invalid={!!errors.email}
+                  invalidText={errors.email?.message}
                 />
 
                 {/* Passwords */}
                 <div className="flex gap-4">
-                  <Controller
-                    name="password"
-                    control={control}
-                    render={({ field }) => (
-                      <PasswordInput
-                        {...field}
-                        id="password"
-                        labelText="Password"
-                        className="w-1/2"
-                        invalid={!!errors.password}
-                        invalidText={errors.password?.message}
-                      />
-                    )}
+                  <PasswordInput
+                    {...register("password")}
+                    id="password"
+                    labelText="Password"
+                    className="w-1/2"
+                    invalid={!!errors.password}
+                    invalidText={errors.password?.message}
                   />
 
-                  <Controller
-                    name="confirm_password"
-                    control={control}
-                    render={({ field }) => (
-                      <PasswordInput
-                        {...field}
-                        id="confirm_password"
-                        labelText="Confirm Password"
-                        className="w-1/2"
-                        invalid={!!errors.confirm_password}
-                        invalidText={errors.confirm_password?.message}
-                      />
-                    )}
+                  <PasswordInput
+                    {...register("confirm_password")}
+                    id="confirm_password"
+                    labelText="Confirm Password"
+                    className="w-1/2"
+                    invalid={!!errors.confirm_password}
+                    invalidText={errors.confirm_password?.message}
                   />
                 </div>
 
