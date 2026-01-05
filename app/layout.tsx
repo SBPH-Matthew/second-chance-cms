@@ -1,33 +1,18 @@
 import type { Metadata } from "next";
-import {
-    Geist,
-    Geist_Mono,
-    IBM_Plex_Mono,
-    IBM_Plex_Sans,
-} from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import "./globals.scss";
-import Providers from "./providers";
+import Providers from "./providers"; // Ensure the filename case matches (Providers vs providers)
 
-const geistSans = Geist({
-    variable: "--font-geist-sans",
-    subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
-    subsets: ["latin"],
-});
-
-// Configure Sans Serif (Main UI Font)
+// Configure IBM Plex Sans (Carbon's default UI font)
 const plexSans = IBM_Plex_Sans({
     subsets: ["latin"],
     weight: ["300", "400", "600"],
     display: "swap",
-    variable: "--cds-font-family-sans", // Custom variable for Carbon
+    variable: "--cds-font-family-sans",
 });
 
-// Configure Mono (Code/Data Font)
+// Configure IBM Plex Mono
 const plexMono = IBM_Plex_Mono({
     subsets: ["latin"],
     weight: ["300", "400"],
@@ -42,13 +27,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
     children,
-}: Readonly<{
+}: {
     children: React.ReactNode;
-}>) {
+}) {
     return (
         <html lang="en">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} ${plexSans.variable} ${plexMono.variable} antialiased`}
+                className={`${plexSans.variable} ${plexMono.variable} antialiased`}
             >
                 <Providers>{children}</Providers>
             </body>

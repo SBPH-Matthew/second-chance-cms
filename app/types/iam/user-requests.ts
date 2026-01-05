@@ -34,3 +34,25 @@ export const updateUserSchema = z.object({
 });
 
 export type UpdateUserSchema = z.infer<typeof updateUserSchema>;
+
+export const updateUserPassword = z
+    .object({
+        old_password: z
+            .string({ message: "Old Password is required" })
+            .min(8)
+            .max(255),
+        new_password: z
+            .string({ message: "New Password is required" })
+            .min(8)
+            .max(255),
+        confirm_password: z
+            .string({ message: "Confirm Password is required" })
+            .min(8)
+            .max(255),
+    })
+    .refine((data) => data.new_password === data.confirm_password, {
+        message: "New passwords do not match.",
+        path: ["confirm_password"],
+    });
+
+export type UpdateUserPasswordSchema = z.Infer<typeof updateUserPassword>;

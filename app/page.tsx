@@ -1,6 +1,6 @@
 "use client";
 import { Information } from "@carbon/icons-react";
-import { Button } from "@carbon/react";
+import { Button, Tab, TabList, TabPanel, TabPanels, Tabs } from "@carbon/react";
 import Image from "next/image";
 
 export default function Home() {

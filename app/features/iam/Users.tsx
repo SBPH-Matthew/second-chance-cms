@@ -1,8 +1,7 @@
 "use client";
-import { Add, OverflowMenuHorizontal } from "@carbon/icons-react";
+import { Add, Information, OverflowMenuHorizontal } from "@carbon/icons-react";
 import {
     Button,
-    ContentSwitcher,
     DataTableSkeleton,
     Form,
     Modal,
@@ -12,7 +11,7 @@ import {
     Select,
     SelectItem,
     SelectSkeleton,
-    Switch,
+    Tab,
     Table,
     TableBody,
     TableCell,
@@ -25,7 +24,14 @@ import {
     TableToolbarContent,
     TableToolbarMenu,
     TableToolbarSearch,
+    TabList,
+    TabPanel,
+    TabPanels,
+    Tabs,
     TextInput,
+    Toggletip,
+    ToggletipButton,
+    ToggletipContent,
 } from "@carbon/react";
 import {
     useCreateUser,
@@ -353,86 +359,183 @@ export const Users = () => {
                 onRequestSubmit={submitUpdate(handleUpdatePayload)}
                 loadingDescription="Updating user"
                 loadingStatus={CreateOrUpdateStatus}
+                id="update"
             >
-                <div className="pb-12!">
-                    <ContentSwitcher>
-                        <Switch name="one" text="User Details" />
-
-                        <Switch name="two" text="Change Password" />
-                    </ContentSwitcher>
-                </div>
-                <Form className="flex flex-col gap-5">
-                    <TextInput
-                        id="update_fname"
-                        labelText={
-                            <span className="flex items-center gap-1">
-                                First Name
-                                <span className="text-red-500">*</span>
-                            </span>
-                        }
-                        placeholder="Enter first name"
-                        required
-                        {...updateRegister("first_name")}
-                        invalid={!!errorsUpdate.first_name}
-                        invalidText={errorsUpdate.first_name?.message}
-                    />
-                    <TextInput
-                        id="update_lname"
-                        labelText={
-                            <span className="flex items-center gap-1">
-                                Last Name
-                                <span className="text-red-500">*</span>
-                            </span>
-                        }
-                        placeholder="Enter last name"
-                        required
-                        {...updateRegister("last_name")}
-                        invalid={!!errorsUpdate.last_name}
-                        invalidText={errorsUpdate.last_name?.message}
-                    />
-                    <TextInput
-                        id="update_email"
-                        labelText={
-                            <span className="flex items-center gap-1">
-                                Email
-                                <span className="text-red-500">*</span>
-                            </span>
-                        }
-                        placeholder="Enter email"
-                        required
-                        type="email"
-                        {...updateRegister("email")}
-                        invalid={!!errorsUpdate.email}
-                        invalidText={errorsUpdate.email?.message}
-                    />
-
-                    {loadingRoles || getRoles?.roles.total === 0 ? (
-                        <SelectSkeleton />
-                    ) : (
-                        <Select
-                            id="role_update"
-                            labelText={
-                                <span className="flex items-center gap-1">
-                                    Role
-                                    <span className="text-red-500">*</span>
-                                </span>
-                            }
-                            {...updateRegister("role")}
-                            className="capitalize!"
-                            invalid={!!errorsUpdate.role}
-                            invalidText={errorsUpdate.role?.message}
-                        >
-                            {getRoles?.roles.items.map((role) => (
-                                <SelectItem
-                                    className="capitalize"
-                                    key={role.id}
-                                    value={role.id}
-                                    text={role.name}
+                <Tabs defaultSelectedIndex={0}>
+                    <TabList>
+                        <Tab>User Details</Tab>
+                        <Tab>Change Password</Tab>
+                    </TabList>
+                    <TabPanels>
+                        <TabPanel>
+                            <div className="flex flex-col gap-5 pt-5!">
+                                <TextInput
+                                    id="update_fname"
+                                    labelText={
+                                        <span className="flex items-center gap-1">
+                                            First Name
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </span>
+                                    }
+                                    placeholder="Enter first name"
+                                    required
+                                    {...updateRegister("first_name")}
+                                    invalid={!!errorsUpdate.first_name}
+                                    invalidText={
+                                        errorsUpdate.first_name?.message
+                                    }
                                 />
-                            ))}
-                        </Select>
-                    )}
-                </Form>
+                                <TextInput
+                                    id="update_lname"
+                                    labelText={
+                                        <span className="flex items-center gap-1">
+                                            Last Name
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </span>
+                                    }
+                                    placeholder="Enter last name"
+                                    required
+                                    {...updateRegister("last_name")}
+                                    invalid={!!errorsUpdate.last_name}
+                                    invalidText={
+                                        errorsUpdate.last_name?.message
+                                    }
+                                />
+                                <TextInput
+                                    id="update_email"
+                                    labelText={
+                                        <span className="flex items-center gap-1">
+                                            Email
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </span>
+                                    }
+                                    placeholder="Enter email"
+                                    required
+                                    type="email"
+                                    {...updateRegister("email")}
+                                    invalid={!!errorsUpdate.email}
+                                    invalidText={errorsUpdate.email?.message}
+                                />
+
+                                {loadingRoles || getRoles?.roles.total === 0 ? (
+                                    <SelectSkeleton />
+                                ) : (
+                                    <Select
+                                        id="role_update"
+                                        labelText={
+                                            <span className="flex items-center gap-1">
+                                                Role
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
+                                            </span>
+                                        }
+                                        {...updateRegister("role")}
+                                        className="capitalize!"
+                                        invalid={!!errorsUpdate.role}
+                                        invalidText={errorsUpdate.role?.message}
+                                    >
+                                        {getRoles?.roles.items.map((role) => (
+                                            <SelectItem
+                                                className="capitalize"
+                                                key={role.id}
+                                                value={role.id}
+                                                text={role.name}
+                                            />
+                                        ))}
+                                    </Select>
+                                )}
+                            </div>
+                        </TabPanel>
+                        <TabPanel>
+                            <div className="flex flex-col gap-5">
+                                <PasswordInput
+                                    id="old_password"
+                                    labelText={
+                                        <span className="flex items-center gap-1">
+                                            Old Password
+                                            <Toggletip>
+                                                <ToggletipButton label="Show Information">
+                                                    <Information />
+                                                </ToggletipButton>
+                                                <ToggletipContent>
+                                                    <p>
+                                                        Enter your current
+                                                        password.
+                                                    </p>
+                                                </ToggletipContent>
+                                            </Toggletip>
+                                        </span>
+                                    }
+                                    size="md"
+                                    placeholder="Create password"
+                                    required
+                                    {...register("password")}
+                                    invalid={!!errors.password}
+                                    invalidText={errors.password?.message}
+                                />
+
+                                <PasswordInput
+                                    id="new_password"
+                                    labelText={
+                                        <span className="flex items-center gap-1">
+                                            New Password
+                                            <Toggletip>
+                                                <ToggletipButton label="Show Information">
+                                                    <Information />
+                                                </ToggletipButton>
+                                                <ToggletipContent>
+                                                    <p>
+                                                        Create your new
+                                                        password.
+                                                    </p>
+                                                </ToggletipContent>
+                                            </Toggletip>
+                                        </span>
+                                    }
+                                    size="md"
+                                    placeholder="Create password"
+                                    required
+                                    {...register("password")}
+                                    invalid={!!errors.password}
+                                    invalidText={errors.password?.message}
+                                />
+
+                                <PasswordInput
+                                    id="change_confirm_password"
+                                    labelText={
+                                        <span className="flex items-center gap-1">
+                                            Confirm Password
+                                            <Toggletip>
+                                                <ToggletipButton label="Show Information">
+                                                    <Information />
+                                                </ToggletipButton>
+                                                <ToggletipContent>
+                                                    <p>
+                                                        Re-enter your new
+                                                        password.
+                                                    </p>
+                                                </ToggletipContent>
+                                            </Toggletip>
+                                        </span>
+                                    }
+                                    size="md"
+                                    placeholder="Create password"
+                                    required
+                                    {...register("password")}
+                                    invalid={!!errors.password}
+                                    invalidText={errors.password?.message}
+                                />
+                            </div>
+                        </TabPanel>
+                    </TabPanels>
+                </Tabs>
             </Modal>
             {loadingPaginateUsers ? (
                 <DataTableSkeleton
