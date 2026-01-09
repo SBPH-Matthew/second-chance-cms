@@ -1,6 +1,12 @@
 "use client";
 import { ContentLayout } from "@/app/components";
-import { Category as CaCategory, Fade } from "@carbon/icons-react";
+import {
+  Category as CaCategory,
+  Fade,
+  GroupAccess,
+  Product,
+  UserAccess,
+} from "@carbon/icons-react";
 import {
   Header,
   HeaderContainer,
@@ -52,32 +58,20 @@ export const DashboardLayout = ({
                       Category Settings
                     </SideNavMenuItem>
                   </SideNavMenu>
-                  <SideNavMenu
-                    renderIcon={Fade}
-                    title="Product"
-                    isActive={true}
-                    large
-                  >
+                  <SideNavMenu renderIcon={GroupAccess} title="IAM" large>
                     <SideNavMenuItem href="https://www.carbondesignsystem.com/">
-                      Manage Products
+                      User
                     </SideNavMenuItem>
-                    <SideNavMenuItem
-                      aria-current="page"
-                      href="https://www.carbondesignsystem.com/"
-                    >
-                      Product Settings
+                    <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+                      Role
+                    </SideNavMenuItem>
+                    <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+                      Policy
                     </SideNavMenuItem>
                   </SideNavMenu>
-                  <SideNavMenu renderIcon={Fade} title="Category title" large>
-                    <SideNavMenuItem href="https://www.carbondesignsystem.com/">
-                      Link
-                    </SideNavMenuItem>
-                    <SideNavMenuItem href="https://www.carbondesignsystem.com/">
-                      Link
-                    </SideNavMenuItem>
-                    <SideNavMenuItem href="https://www.carbondesignsystem.com/">
-                      Link
-                    </SideNavMenuItem>
+                  <SideNavMenu renderIcon={Product} title="Products" large>
+                    <SideNavMenuItem>Manage Products</SideNavMenuItem>
+                    <SideNavMenuItem>Product Settings</SideNavMenuItem>
                   </SideNavMenu>
                   <SideNavLink
                     renderIcon={Fade}

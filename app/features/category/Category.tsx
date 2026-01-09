@@ -171,6 +171,11 @@ export const Category = () => {
             });
           });
         }
+
+        setTimeout(() => {
+          resetCreate();
+          resetUpdate();
+        }, 1000);
       });
   };
 
