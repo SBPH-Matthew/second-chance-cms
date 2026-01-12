@@ -3,3 +3,4 @@ export * from "./dashboard";
 export * from "./category";
 export * from "./iam";
 export * from "./roles";
+export * from "./product";

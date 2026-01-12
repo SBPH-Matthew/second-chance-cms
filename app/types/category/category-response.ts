@@ -26,6 +26,11 @@ export type CategoryPaginationResponse = {
   };
 };
 
+export type GetAllCategoriesResponse = {
+  message: string;
+  categories: Array<CategoryListType>;
+};
+
 export type CategoryListType = {
   id: number;
   name: string;

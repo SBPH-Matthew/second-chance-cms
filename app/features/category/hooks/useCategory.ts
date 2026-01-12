@@ -1,6 +1,7 @@
 import {
   createCategory,
   deleteCategory,
+  getAllCategories,
   getCategoryGroups,
   getCategoryStatuses,
   paginateCategories,
@@ -65,6 +66,15 @@ export const usePaginateCategories = ({
   const { data, isPending, error } = useQuery({
     queryKey: ["paginate-categories", page, limit],
     queryFn: ({ signal }) => paginateCategories({ page, limit, signal }),
+  });
+
+  return { data, isPending, error };
+};
+
+export const useGetAllCategories = () => {
+  const { data, isPending, error } = useQuery({
+    queryKey: ["all-categories"],
+    queryFn: ({ signal }) => getAllCategories(signal),
   });
 
   return { data, isPending, error };

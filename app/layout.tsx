@@ -7,7 +7,7 @@ import Providers from "./providers"; // Ensure the filename case matches (Provid
 // Configure IBM Plex Sans (Carbon's default UI font)
 const plexSans = IBM_Plex_Sans({
     subsets: ["latin"],
-    weight: ["300", "400", "600"],
+    weight: ["100", "200", "300", "400", "600"],
     display: "swap",
     variable: "--cds-font-family-sans",
 });

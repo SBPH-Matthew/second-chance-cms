@@ -2,6 +2,7 @@ import {
   CategoryPaginationResponse,
   CreateCategoryRequest,
   CreateCategoryResponse,
+  GetAllCategoriesResponse,
   GetCategoryGroupsResponse,
   GetCategoryStatusesResponse,
   SetCategoryStatusRequest,
@@ -115,6 +116,30 @@ export const paginateCategories = async ({
 }: PaginateCategoriesParams): Promise<CategoryPaginationResponse> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API}/category/?page=${page}&limit=${limit}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      signal,
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw data;
+  }
+
+  return data;
+};
+
+export const getAllCategories = async (
+  signal?: AbortSignal,
+): Promise<GetAllCategoriesResponse> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/category/all`,
     {
       method: "GET",
       headers: {

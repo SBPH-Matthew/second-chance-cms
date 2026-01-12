@@ -21,12 +21,14 @@ import {
   Theme,
 } from "@carbon/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export const DashboardLayout = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
+  const pathname = usePathname();
   return (
     <Theme theme="g100">
       <HeaderContainer
@@ -51,10 +53,18 @@ export const DashboardLayout = ({
               >
                 <SideNavItems>
                   <SideNavMenu renderIcon={CaCategory} title="Category" large>
-                    <SideNavMenuItem as={Link} href="/category">
+                    <SideNavMenuItem
+                      as={Link}
+                      href="/category"
+                      isActive={pathname === "/category"}
+                    >
                       Manage Categories
                     </SideNavMenuItem>
-                    <SideNavMenuItem as={Link} href="/category/settings">
+                    <SideNavMenuItem
+                      as={Link}
+                      href="/category/settings"
+                      isActive={pathname === "/category/settings"}
+                    >
                       Category Settings
                     </SideNavMenuItem>
                   </SideNavMenu>
@@ -70,8 +80,20 @@ export const DashboardLayout = ({
                     </SideNavMenuItem>
                   </SideNavMenu>
                   <SideNavMenu renderIcon={Product} title="Products" large>
-                    <SideNavMenuItem>Manage Products</SideNavMenuItem>
-                    <SideNavMenuItem>Product Settings</SideNavMenuItem>
+                    <SideNavMenuItem
+                      as={Link}
+                      href="/product"
+                      isActive={pathname === "/product"}
+                    >
+                      Manage Products
+                    </SideNavMenuItem>
+                    <SideNavMenuItem
+                      as={Link}
+                      href="/product/settings"
+                      isActive={pathname === "/product/settings"}
+                    >
+                      Product Settings
+                    </SideNavMenuItem>
                   </SideNavMenu>
                   <SideNavLink
                     renderIcon={Fade}
