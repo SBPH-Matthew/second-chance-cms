@@ -109,6 +109,9 @@ export const CategoryModal = ({
                 queryClient.invalidateQueries({
                     queryKey: ["paginate-categories"],
                 });
+                queryClient.invalidateQueries({
+                    queryKey: ["all-categories"],
+                });
                 setTimeout(() => {
                     onClose(); // Parent should handle state cleanup if needed
                 }, 500);

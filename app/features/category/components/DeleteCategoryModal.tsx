@@ -44,6 +44,9 @@ export const DeleteCategoryModal = ({
                     queryClient.invalidateQueries({
                         queryKey: ["paginate-categories"],
                     });
+                    queryClient.invalidateQueries({
+                        queryKey: ["all-categories"],
+                    });
                     setTimeout(() => {
                         onClose();
                     }, 500);

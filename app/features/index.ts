@@ -4,3 +4,4 @@ export * from "./category";
 export * from "./iam";
 export * from "./roles";
 export * from "./product";
+export * from "./vehicle";

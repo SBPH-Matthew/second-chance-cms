@@ -1,6 +1,10 @@
 import {
   createCategory,
+  createCategoryGroup,
+  createCategoryStatus,
   deleteCategory,
+  deleteCategoryGroup,
+  deleteCategoryStatus,
   getAllCategories,
   getCategoryGroups,
   getCategoryStatuses,
@@ -8,6 +12,14 @@ import {
   PaginateCategoriesParams,
   setCategoryStatus,
   updateCategory,
+  updateCategoryGroup,
+  updateCategoryStatus,
+  CreateCategoryGroupRequest,
+  CreateCategoryGroupResponse,
+  UpdateCategoryGroupResponse,
+  CreateCategoryStatusRequest,
+  CreateCategoryStatusResponse,
+  UpdateCategoryStatusResponse,
 } from "@/app/services";
 import {
   CreateCategoryRequest,
@@ -95,5 +107,65 @@ export const useSetCategoryStatus = () => {
   >({
     mutationKey: ["set-category-status"],
     mutationFn: setCategoryStatus,
+  });
+};
+
+// Category Group hooks
+export const useCreateCategoryGroup = () => {
+  return useMutation<
+    CreateCategoryGroupResponse,
+    ValidationResponse,
+    CreateCategoryGroupRequest
+  >({
+    mutationKey: ["create-category-group"],
+    mutationFn: createCategoryGroup,
+  });
+};
+
+export const useUpdateCategoryGroup = () => {
+  return useMutation<
+    UpdateCategoryGroupResponse,
+    ValidationResponse,
+    { id: number; payload: CreateCategoryGroupRequest }
+  >({
+    mutationKey: ["update-category-group"],
+    mutationFn: updateCategoryGroup,
+  });
+};
+
+export const useDeleteCategoryGroup = () => {
+  return useMutation({
+    mutationKey: ["delete-category-group"],
+    mutationFn: deleteCategoryGroup,
+  });
+};
+
+// Category Status hooks
+export const useCreateCategoryStatus = () => {
+  return useMutation<
+    CreateCategoryStatusResponse,
+    ValidationResponse,
+    CreateCategoryStatusRequest
+  >({
+    mutationKey: ["create-category-status"],
+    mutationFn: createCategoryStatus,
+  });
+};
+
+export const useUpdateCategoryStatus = () => {
+  return useMutation<
+    UpdateCategoryStatusResponse,
+    ValidationResponse,
+    { id: number; payload: CreateCategoryStatusRequest }
+  >({
+    mutationKey: ["update-category-status"],
+    mutationFn: updateCategoryStatus,
+  });
+};
+
+export const useDeleteCategoryStatus = () => {
+  return useMutation({
+    mutationKey: ["delete-category-status"],
+    mutationFn: deleteCategoryStatus,
   });
 };

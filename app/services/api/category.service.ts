@@ -204,3 +204,191 @@ export const setCategoryStatus = async ({
 
   return data;
 };
+
+// Category Group CRUD operations
+export interface CreateCategoryGroupRequest {
+  name: string;
+}
+
+export interface CreateCategoryGroupResponse {
+  message: string;
+  category_group: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface UpdateCategoryGroupResponse {
+  message: string;
+  category_group: {
+    id: number;
+    name: string;
+  };
+}
+
+export const createCategoryGroup = async (
+  payload: CreateCategoryGroupRequest,
+): Promise<CreateCategoryGroupResponse> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/category-group/`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw data;
+  }
+
+  return data;
+};
+
+export const updateCategoryGroup = async ({
+  id,
+  payload,
+}: {
+  id: number;
+  payload: CreateCategoryGroupRequest;
+}): Promise<UpdateCategoryGroupResponse> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/category-group/${id}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw data;
+  }
+
+  return data;
+};
+
+export const deleteCategoryGroup = async (id: number) => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/category-group/${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw data;
+  }
+
+  return data;
+};
+
+// Category Status CRUD operations
+export interface CreateCategoryStatusRequest {
+  name: string;
+}
+
+export interface CreateCategoryStatusResponse {
+  message: string;
+  category_status: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface UpdateCategoryStatusResponse {
+  message: string;
+  category_status: {
+    id: number;
+    name: string;
+  };
+}
+
+export const createCategoryStatus = async (
+  payload: CreateCategoryStatusRequest,
+): Promise<CreateCategoryStatusResponse> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/category-status/`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw data;
+  }
+
+  return data;
+};
+
+export const updateCategoryStatus = async ({
+  id,
+  payload,
+}: {
+  id: number;
+  payload: CreateCategoryStatusRequest;
+}): Promise<UpdateCategoryStatusResponse> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/category-status/${id}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw data;
+  }
+
+  return data;
+};
+
+export const deleteCategoryStatus = async (id: number) => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API}/category-status/${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    },
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw data;
+  }
+
+  return data;
+};

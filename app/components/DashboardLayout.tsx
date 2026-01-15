@@ -6,6 +6,7 @@ import {
   GroupAccess,
   Product,
   UserAccess,
+  VehicleApi,
 } from "@carbon/icons-react";
 import {
   Header,
@@ -62,17 +63,32 @@ export const DashboardLayout = ({
                     </SideNavMenuItem>
                     <SideNavMenuItem
                       as={Link}
-                      href="/category/settings"
-                      isActive={pathname === "/category/settings"}
+                      href="/category/groups"
+                      isActive={pathname === "/category/groups"}
                     >
-                      Category Settings
+                      Category Groups
+                    </SideNavMenuItem>
+                    <SideNavMenuItem
+                      as={Link}
+                      href="/category/status"
+                      isActive={pathname === "/category/status"}
+                    >
+                      Category Status
                     </SideNavMenuItem>
                   </SideNavMenu>
                   <SideNavMenu renderIcon={GroupAccess} title="IAM" large>
-                    <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+                    <SideNavMenuItem
+                      as={Link}
+                      href="/user"
+                      isActive={pathname === "/user"}
+                    >
                       User
                     </SideNavMenuItem>
-                    <SideNavMenuItem href="https://www.carbondesignsystem.com/">
+                    <SideNavMenuItem
+                      as={Link}
+                      href="/role"
+                      isActive={pathname === "/role"}
+                    >
                       Role
                     </SideNavMenuItem>
                     <SideNavMenuItem href="https://www.carbondesignsystem.com/">
@@ -89,10 +105,33 @@ export const DashboardLayout = ({
                     </SideNavMenuItem>
                     <SideNavMenuItem
                       as={Link}
-                      href="/product/settings"
-                      isActive={pathname === "/product/settings"}
+                      href="/product/status"
+                      isActive={pathname === "/product/status"}
                     >
-                      Product Settings
+                      Product Status
+                    </SideNavMenuItem>
+                    <SideNavMenuItem
+                      as={Link}
+                      href="/product/condition"
+                      isActive={pathname === "/product/condition"}
+                    >
+                      Product Condition
+                    </SideNavMenuItem>
+                  </SideNavMenu>
+                  <SideNavMenu renderIcon={VehicleApi} title="Vehicles" large>
+                    <SideNavMenuItem
+                      as={Link}
+                      href="/vehicle"
+                      isActive={pathname === "/vehicle"}
+                    >
+                      Manage Vehicles
+                    </SideNavMenuItem>
+                    <SideNavMenuItem
+                      as={Link}
+                      href="/vehicle/type"
+                      isActive={pathname === "/vehicle/type"}
+                    >
+                      Vehicle Type
                     </SideNavMenuItem>
                   </SideNavMenu>
                   <SideNavLink

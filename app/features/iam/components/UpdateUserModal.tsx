@@ -137,6 +137,9 @@ export const UpdateUserModal = ({ open, onClose, user }: UpdateUserModalProps) =
                             });
                         });
                     }
+                    setTimeout(() => {
+                        UpdateReset();
+                    }, 2000);
                 },
             }
         );
@@ -160,6 +163,9 @@ export const UpdateUserModal = ({ open, onClose, user }: UpdateUserModalProps) =
                             });
                         });
                     }
+                    setTimeout(() => {
+                        PasswordReset();
+                    }, 2000);
                 },
             }
         );

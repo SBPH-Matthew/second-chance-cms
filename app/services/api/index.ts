@@ -5,3 +5,4 @@ export * from "./role.service";
 export * from "./product.service";
 export * from "./product-condition.service";
 export * from "./product-status.service";
+export * from "./vehicle.service";

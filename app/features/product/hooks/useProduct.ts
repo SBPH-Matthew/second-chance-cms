@@ -41,7 +41,7 @@ export const usePaginateMyProducts = ({
 
 export const useCreateProduct = () => {
     return useMutation<
-        CreateProductResponse,
+        ResponseType,
         ValidationResponse,
         CreateProductRequest
     >({

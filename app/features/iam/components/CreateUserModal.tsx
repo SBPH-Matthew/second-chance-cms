@@ -77,6 +77,9 @@ export const CreateUserModal = ({ open, onClose }: CreateUserModalProps) => {
                         });
                     });
                 }
+                setTimeout(() => {
+                    CreateReset();
+                }, 2000);
             },
         });
     };

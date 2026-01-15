@@ -43,6 +43,9 @@ export const UpdateCategoryStatusModal = ({
                     queryClient.invalidateQueries({
                         queryKey: ["paginate-categories"],
                     });
+                    queryClient.invalidateQueries({
+                        queryKey: ["all-categories"],
+                    });
                     setTimeout(() => {
                         onClose();
                     }, 500);
