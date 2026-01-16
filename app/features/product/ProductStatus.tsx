@@ -98,54 +98,59 @@ export const ProductStatus = () => {
               </Button>
             </TableToolbarContent>
           </TableToolbar>
-          {isEmpty ? (
-            <div className="flex flex-col items-start justify-center py-16 gap-4 ps-5! pt-5!">
-              <h3 className="text-xl font-semibold">No product statuses yet</h3>
-              <p className="text-gray-500 max-w-md">
-                Product statuses help define the lifecycle states of your products. Create your first
-                product status to get started.
-              </p>
-              <Button renderIcon={Add} onClick={handleOpenCreate}>
-                Add Product Status
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableHeader>Product Status Name</TableHeader>
-                    <TableHeader>Actions</TableHeader>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeader>Product Status Name</TableHeader>
+                <TableHeader>Actions</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isEmpty ? (
+                <TableRow>
+                  <TableCell colSpan={2}>
+                    <div className="flex flex-col items-start justify-center gap-4 ps-5! py-5!">
+                      <h3 className="text-xl font-semibold">
+                        No product statuses yet
+                      </h3>
+                      <p className="text-gray-500 max-w-md">
+                        Product statuses help define the lifecycle states of
+                        your products. Create your first product status to get
+                        started.
+                      </p>
+                      <Button renderIcon={Add} onClick={handleOpenCreate}>
+                        Add Product Status
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                productStatusesData?.product_status.map((status) => (
+                  <TableRow key={status.id}>
+                    <TableCell>{status.name}</TableCell>
+                    <TableCell>
+                      <OverflowMenu
+                        aria-label="actions"
+                        renderIcon={OverflowMenuHorizontal}
+                        flipped
+                      >
+                        <OverflowMenuItem
+                          itemText="Edit"
+                          onClick={() => handleOpenEdit(status)}
+                        />
+                        <OverflowMenuItem
+                          hasDivider
+                          itemText="Delete"
+                          isDelete
+                          onClick={() => handleOpenDelete(status)}
+                        />
+                      </OverflowMenu>
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {productStatusesData?.product_status.map((status) => (
-                    <TableRow key={status.id}>
-                      <TableCell>{status.name}</TableCell>
-                      <TableCell>
-                        <OverflowMenu
-                          aria-label="actions"
-                          renderIcon={OverflowMenuHorizontal}
-                          flipped
-                        >
-                          <OverflowMenuItem
-                            itemText="Edit"
-                            onClick={() => handleOpenEdit(status)}
-                          />
-                          <OverflowMenuItem
-                            hasDivider
-                            itemText="Delete"
-                            isDelete
-                            onClick={() => handleOpenDelete(status)}
-                          />
-                        </OverflowMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </>
-          )}
+                ))
+              )}
+            </TableBody>
+          </Table>
         </TableContainer>
       )}
     </section>

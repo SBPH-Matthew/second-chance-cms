@@ -1,63 +1,42 @@
 import { z } from "zod";
+import { ResponseType } from "../ResponseType";
+import { Category } from "../category";
+import { User } from "../shared";
 
+// Backend model types (snake_case from JSON tags)
 export interface Product {
   id: number;
   name: string;
   description: string;
   price: number;
-  images?: string[];
-  status?: ProductStatus | null;
-  condition?: ProductCondition | null;
-  category?: ProductCategory | null;
+  images: string[];
+  category_id: number;
+  status_id: number;
+  seller_id: number;
+  product_condition_id: number;
+  category?: Category;
+  status?: ProductStatus;
+  seller?: User;
+  product_condition?: ProductCondition;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
 }
 
-export interface ProductCategory {
-  ID?: number;
-  Name?: string;
-  CreatedAt?: string;
-  UpdatedAt?: string;
-  DeletedAt?: string | null;
-  StatusID?: number;
-  CategoryGroupID?: number;
-  Status?: any;
-  CategoryGroup?: any;
-}
-
-// For nested objects in Product (from pagination response - uses capitalized)
 export interface ProductStatus {
-  ID?: number;
-  Name?: string;
-  CreatedAt?: string;
-  UpdatedAt?: string;
-  DeletedAt?: string | null;
-}
-
-// For API responses (uses lowercase)
-export interface ProductStatusResponse {
   id: number;
   name: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
 }
 
 export interface ProductCondition {
-  ID?: number;
-  Name?: string;
-  CreatedAt?: string;
-  UpdatedAt?: string;
-  DeletedAt?: string | null;
-}
-
-// For API responses (uses lowercase)
-export interface ProductConditionResponse {
   id: number;
   name: string;
-}
-
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  first_name?: string;
-  last_name?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
 }
 
 // Zod Schemas
@@ -75,30 +54,17 @@ export const CreateProductSchema = z.object({
 export type CreateProductRequest = z.infer<typeof CreateProductSchema>;
 
 // API Responses
-export interface ProductPaginationResponse {
-  message: string;
+export interface ProductPaginationResponse extends ResponseType {
   products: {
     total: number;
     items: Product[];
   };
 }
 
-export interface CreateProductResponse {
-  message: string;
-  product: Product;
+export interface GetProductConditionsResponse extends ResponseType {
+  product_conditions: ProductCondition[];
 }
 
-export interface ProductDetailsResponse {
-  message: string;
-  product: Product;
-}
-
-export interface GetProductConditionsResponse {
-  message: string;
-  product_conditions: ProductConditionResponse[];
-}
-
-export interface GetProductStatusesResponse {
-  message: string;
-  product_status: ProductStatusResponse[];
+export interface GetProductStatusesResponse extends ResponseType {
+  product_status: ProductStatus[];
 }

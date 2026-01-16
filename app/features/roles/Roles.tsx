@@ -53,44 +53,47 @@ export const Roles = () => {
               <TableToolbarSearch />
             </TableToolbarContent>
           </TableToolbar>
-          {isEmpty ? (
-            <div className="flex flex-col items-start justify-center py-16 gap-4 ps-5! pt-5!">
-              <h3 className="text-xl font-semibold">No roles found</h3>
-              <p className="text-gray-500 max-w-md">
-                Roles define user permissions and access levels in the system.
-              </p>
-            </div>
-          ) : (
-            <>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableHeader>Role Name</TableHeader>
-                    <TableHeader>Actions</TableHeader>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeader>Role Name</TableHeader>
+                <TableHeader>Actions</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isEmpty ? (
+                <TableRow>
+                  <TableCell colSpan={2}>
+                    <div className="flex flex-col items-start justify-center gap-4 ps-5! py-5!">
+                      <h3 className="text-xl font-semibold">No roles found</h3>
+                      <p className="text-gray-500 max-w-md">
+                        Roles define user permissions and access levels in the
+                        system.
+                      </p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                roles.map((role) => (
+                  <TableRow key={role.id}>
+                    <TableCell>{role.name}</TableCell>
+                    <TableCell>
+                      <OverflowMenu
+                        aria-label="actions"
+                        renderIcon={OverflowMenuHorizontal}
+                        flipped
+                      >
+                        <OverflowMenuItem
+                          itemText="View Details"
+                          disabled
+                        />
+                      </OverflowMenu>
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {roles.map((role) => (
-                    <TableRow key={role.id}>
-                      <TableCell>{role.name}</TableCell>
-                      <TableCell>
-                        <OverflowMenu
-                          aria-label="actions"
-                          renderIcon={OverflowMenuHorizontal}
-                          flipped
-                        >
-                          <OverflowMenuItem
-                            itemText="View Details"
-                            disabled
-                          />
-                        </OverflowMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </>
-          )}
+                ))
+              )}
+            </TableBody>
+          </Table>
         </TableContainer>
       )}
     </section>

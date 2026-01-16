@@ -58,13 +58,13 @@ export const VehicleFormModal = ({
     if (open) {
       if (initialData) {
         const initialValues = {
-          vehicleMake: initialData.vehicleMake,
-          vehicleModel: initialData.vehicleModel,
+          vehicleMake: initialData.vehicle_make || "",
+          vehicleModel: initialData.vehicle_model || "",
           year: initialData.year,
           price: initialData.price,
           description: initialData.description || "",
           location: initialData.location || "",
-          vehicleType: initialData.vehicleTypeId || 0,
+          vehicleType: initialData.vehicle_type_id || 0,
         };
         reset(initialValues);
         setExistingImages(initialData.images || []);

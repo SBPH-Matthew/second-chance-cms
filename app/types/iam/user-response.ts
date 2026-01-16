@@ -1,21 +1,13 @@
 import { ResponseType } from "../ResponseType";
+import { User } from "../shared";
 
-export interface UsersItems {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: UserRole;
-}
+// Re-export User for convenience
+export type { User };
 
-export interface UserRole {
-  id: number;
-  name: string;
-}
-
+// Response types
 export interface PaginateUsersResponse extends ResponseType {
   users: {
     total: number;
-    items: Array<UsersItems>;
+    items: User[];
   };
 }

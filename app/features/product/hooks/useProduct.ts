@@ -9,19 +9,18 @@ import {
 } from "@/app/services";
 import {
     CreateProductRequest,
-    CreateProductResponse,
-    ProductDetailsResponse,
     ResponseType,
     ValidationResponse,
+    Product,
 } from "@/app/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export type HookPaginateProducts = Omit<PaginateProductsParams, "signal">;
 
-export const usePaginateProducts = ({ page, limit }: HookPaginateProducts) => {
+export const usePaginateProducts = ({ page, limit, search }: HookPaginateProducts) => {
     const { data, isPending, error } = useQuery({
-        queryKey: ["paginate-products", page, limit],
-        queryFn: ({ signal }) => paginateProducts({ page, limit, signal }),
+        queryKey: ["paginate-products", page, limit, search],
+        queryFn: ({ signal }) => paginateProducts({ page, limit, search, signal }),
     });
 
     return { data, isPending, error };
@@ -69,7 +68,7 @@ export const useDeleteProduct = () => {
 };
 
 export const useProductDetails = (id: number | null) => {
-    const { data, isPending, error } = useQuery<ProductDetailsResponse>({
+    const { data, isPending, error } = useQuery<{ message: string; product: Product }>({
         queryKey: ["product-details", id],
         queryFn: () => getProductDetails(id!),
         enabled: !!id,

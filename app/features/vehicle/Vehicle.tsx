@@ -14,13 +14,13 @@ import {
   TableRow,
   TableToolbar,
   TableToolbarContent,
-  TableToolbarSearch,
   Tag,
   OverflowMenu,
   OverflowMenuItem,
+  TableToolbarSearch,
 } from "@carbon/react";
-import { Add, Edit, TrashCan } from "@carbon/icons-react";
-import { useState } from "react";
+import { Add } from "@carbon/icons-react";
+import { useState, useRef, useEffect } from "react";
 import {
   CreateVehicleRequest,
   Vehicle as VehicleType,
@@ -29,13 +29,12 @@ import { VehicleFormModal } from "./components/VehicleFormModal";
 import { DeleteVehicleModal } from "./components/DeleteVehicleModal";
 import {
   useCreateVehicle,
-  useDeleteVehicle,
   useGetVehicleTypes,
   usePaginateVehicles,
   useUpdateVehicle,
 } from "./hooks";
 import { useQueryClient } from "@tanstack/react-query";
-import { useModalLoading } from "@/app/hooks";
+import { useDebounce } from "@/app/hooks/useDebounce";
 
 const TABLE_HEADERS = [
   { key: "vehicle", header: "Vehicle" },
@@ -50,6 +49,7 @@ export const Vehicle = () => {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [search, setSearch] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -57,12 +57,33 @@ export const Vehicle = () => {
     null
   );
 
+  // Track if we've loaded data at least once (for initial skeleton only)
+  const hasLoadedDataRef = useRef(false);
+
+  // Debounce search input
+  const debouncedSearch = useDebounce(search, 500);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    if (debouncedSearch !== undefined) {
+      setPage(1);
+    }
+  }, [debouncedSearch]);
+
   // Data Fetching
   const { data: vehiclesData, isPending: isLoadingVehicles } =
     usePaginateVehicles({
       page,
       limit: pageSize,
+      search: debouncedSearch || undefined,
     });
+
+  // Mark as loaded once we have data
+  useEffect(() => {
+    if (vehiclesData && !hasLoadedDataRef.current) {
+      hasLoadedDataRef.current = true;
+    }
+  }, [vehiclesData]);
 
   const { data: vehicleTypesData } = useGetVehicleTypes();
 
@@ -70,39 +91,14 @@ export const Vehicle = () => {
   const {
     mutateAsync: createVehicle,
     isPending: isCreating,
-    isSuccess: isCreateSuccess,
-    isError: isCreateError,
     reset: resetCreate,
   } = useCreateVehicle();
 
   const {
     mutateAsync: updateVehicle,
     isPending: isUpdating,
-    isSuccess: isUpdateSuccess,
-    isError: isUpdateError,
     reset: resetUpdate,
   } = useUpdateVehicle();
-
-  const {
-    mutateAsync: deleteVehicle,
-    isPending: isDeleting,
-    isSuccess: isDeleteSuccess,
-    isError: isDeleteError,
-    reset: resetDelete,
-  } = useDeleteVehicle();
-
-  // Loading States
-  const { status: createUpdateStatus } = useModalLoading({
-    loading: isCreating || isUpdating,
-    success: isCreateSuccess || isUpdateSuccess,
-    error: isCreateError || isUpdateError,
-  });
-
-  const { status: deleteStatus } = useModalLoading({
-    loading: isDeleting,
-    success: isDeleteSuccess,
-    error: isDeleteError,
-  });
 
   // Handlers
   const handleAdd = (data: CreateVehicleRequest) => {
@@ -164,31 +160,35 @@ export const Vehicle = () => {
   };
 
   // Prepare data for Table
-  // Map the API response to match our expected format (handle both camelCase and PascalCase)
-  const rows = (vehiclesData?.vehicles.items || []).map((item: any) => ({
-    id: item.id || item.ID,
-    vehicleMake: item.vehicleMake || item.VehicleMake,
-    vehicleModel: item.vehicleModel || item.VehicleModel,
-    year: item.year || item.Year,
-    price: item.price || item.Price,
-    description: item.description || item.Description,
-    location: item.location || item.Location,
-    images: item.images || item.Images || [],
-    vehicleTypeId: item.vehicleTypeId || item.VehicleTypeID,
-    sellerId: item.sellerId || item.SellerID,
-    vehicleType:
-      item.vehicleType || item.VehicleType
+  // Map the API response to match our expected format (snake_case from backend)
+  const rows = (vehiclesData?.vehicles.items || []).map((item: VehicleType) => {
+    const vehicleMake = item.vehicle_make || "";
+    const vehicleModel = item.vehicle_model || "";
+    const vehicleTypeName = item.vehicle_type?.name || "";
+
+    return {
+      id: item.id,
+      vehicleMake,
+      vehicleModel,
+      vehicle: `${vehicleMake} ${vehicleModel}`, // Combined field for display
+      year: item.year || "",
+      price: item.price || 0,
+      description: item.description || "",
+      location: item.location || "",
+      images: item.images || [],
+      vehicleTypeId: item.vehicle_type_id,
+      sellerId: item.seller_id,
+      vehicleType: item.vehicle_type
         ? {
-            id:
-              (item.vehicleType || item.VehicleType).id ||
-              (item.vehicleType || item.VehicleType).ID,
-            name:
-              (item.vehicleType || item.VehicleType).name ||
-              (item.vehicleType || item.VehicleType).Name,
+            id: item.vehicle_type.id,
+            name: vehicleTypeName,
           }
         : undefined,
-    seller: item.seller || item.Seller,
-  }));
+      seller: item.seller,
+      // Store original vehicle object for edit/delete operations
+      originalVehicle: item,
+    };
+  });
   const totalItems = vehiclesData?.vehicles.total || 0;
 
   // Prepare vehicle types
@@ -202,7 +202,8 @@ export const Vehicle = () => {
     return `${apiUrl}${imagePath}`;
   };
 
-  if (isLoadingVehicles) {
+  // Show skeleton only on initial load (first time, no cached data)
+  if (isLoadingVehicles && !hasLoadedDataRef.current) {
     return (
       <DataTableSkeleton
         headers={TABLE_HEADERS}
@@ -225,123 +226,193 @@ export const Vehicle = () => {
           getHeaderProps,
           getRowProps,
           getTableProps,
-        }) => (
-          <TableContainer
-            className="p-0!"
-            title="Vehicles"
-            description="Manage your vehicle inventory"
-          >
-            <TableToolbar>
-              <TableToolbarContent>
-                <TableToolbarSearch />
-                <Button renderIcon={Add} onClick={() => setIsAddOpen(true)}>
-                  Add Vehicle
-                </Button>
-              </TableToolbarContent>
-            </TableToolbar>
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tableRows.map((row) => {
-                  const rowData = rows.find((r) => r.id?.toString() === row.id);
+        }) => {
+          const isEmpty = rows.length === 0;
+          const hasSearch = debouncedSearch && debouncedSearch.trim() !== "";
+          const isEmptyWithSearch = isEmpty && hasSearch;
 
-                  if (!rowData) return null;
-
-                  const vehicleTypeName =
-                    (rowData.vehicleType?.name &&
-                      rowData.vehicleType.name.trim()) ||
-                    "N/A";
-
-                  return (
-                    <TableRow {...getRowProps({ row })} key={row.id}>
-                      <TableCell>
-                        <div className="flex gap-3">
-                          {rowData.images && rowData.images.length > 0 && (
-                            <div className="flex-shrink-0">
-                              <img
-                                src={getImageUrl(rowData.images[0])}
-                                alt={`${rowData.vehicleMake} ${rowData.vehicleModel}`}
-                                className="w-16 h-16 object-cover rounded border"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).style.display =
-                                    "none";
-                                }}
-                              />
-                            </div>
-                          )}
-                          <div className="flex flex-col gap-1 flex-1 min-w-0">
-                            <strong>
-                              {rowData.vehicleMake} {rowData.vehicleModel}
-                            </strong>
-                            {rowData.description && (
-                              <div
-                                className="text-xs text-gray-500 truncate max-w-xs"
-                                title={rowData.description}
+          return (
+            <TableContainer
+              className="p-0!"
+              title="Vehicles"
+              description="Manage your vehicle inventory"
+            >
+              <TableToolbar>
+                <TableToolbarContent>
+                  <TableToolbarSearch
+                    value={search}
+                    onChange={(_, value) => setSearch(value || "")}
+                  />
+                  <Button renderIcon={Add} onClick={() => setIsAddOpen(true)}>
+                    Add Vehicle
+                  </Button>
+                </TableToolbarContent>
+              </TableToolbar>
+              <Table {...getTableProps()}>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader {...getHeaderProps({ header })}>
+                        {header.header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {isEmpty ? (
+                    <TableRow>
+                      <TableCell colSpan={TABLE_HEADERS.length}>
+                        <div className="flex flex-col items-start justify-center gap-4 ps-5! py-5!">
+                          {isEmptyWithSearch ? (
+                            <>
+                              <h3 className="text-xl font-semibold">
+                                No results found
+                              </h3>
+                              <p className="text-gray-500 max-w-md">
+                                No vehicles match your search for "
+                                {debouncedSearch}". Try adjusting your search
+                                terms or clear the search to see all vehicles.
+                              </p>
+                              <Button
+                                kind="ghost"
+                                onClick={() => setSearch("")}
                               >
-                                {rowData.description}
-                              </div>
-                            )}
-                            {rowData.images && rowData.images.length > 1 && (
-                              <div className="text-xs text-gray-400">
-                                +{rowData.images.length - 1} more image
-                                {rowData.images.length - 1 > 1 ? "s" : ""}
-                              </div>
-                            )}
-                          </div>
+                                Clear search
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <h3 className="text-xl font-semibold">
+                                No vehicles yet
+                              </h3>
+                              <p className="text-gray-500 max-w-md">
+                                Vehicles help you manage your inventory. Create
+                                your first vehicle to get started.
+                              </p>
+                              <Button
+                                renderIcon={Add}
+                                onClick={() => setIsAddOpen(true)}
+                              >
+                                Add Vehicle
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </TableCell>
-                      <TableCell>{rowData.year}</TableCell>
-                      <TableCell>₱{rowData.price?.toLocaleString()}</TableCell>
-                      <TableCell>
-                        {rowData.vehicleType ? (
-                          <Tag type="blue">{vehicleTypeName}</Tag>
-                        ) : (
-                          <span className="text-gray-400">N/A</span>
-                        )}
-                      </TableCell>
-                      <TableCell>{rowData.location || "N/A"}</TableCell>
-                      <TableCell>
-                        <OverflowMenu flipped>
-                          <OverflowMenuItem
-                            itemText="Edit"
-                            onClick={() => openEdit(rowData)}
-                          />
-                          <OverflowMenuItem
-                            itemText="Delete"
-                            onClick={() => openDelete(rowData)}
-                            isDelete
-                          />
-                        </OverflowMenu>
-                      </TableCell>
                     </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-            <Pagination
-              backwardText="Previous page"
-              forwardText="Next page"
-              itemsPerPageText="Items per page:"
-              page={page}
-              pageNumberText="Page Number"
-              pageSize={pageSize}
-              pageSizes={[10, 20, 30, 50, 100]}
-              totalItems={totalItems}
-              onChange={({ page, pageSize }) => {
-                setPage(page);
-                setPageSize(pageSize);
-              }}
-            />
-          </TableContainer>
-        )}
+                  ) : (
+                    tableRows.map((row: any) => {
+                      const rowData = rows.find(
+                        (r) => r.id?.toString() === row.id
+                      );
+
+                      if (!rowData) return null;
+
+                      const vehicleTypeName =
+                        (rowData.vehicleType?.name &&
+                          rowData.vehicleType.name.trim()) ||
+                        "N/A";
+
+                      return (
+                        <TableRow {...getRowProps({ row })} key={row.id}>
+                          <TableCell>
+                            <div className="flex gap-3">
+                              {rowData.images && rowData.images.length > 0 && (
+                                <div className="shrink-0!">
+                                  <img
+                                    src={getImageUrl(rowData.images[0])}
+                                    alt={`${rowData.vehicleMake || ""} ${
+                                      rowData.vehicleModel || ""
+                                    }`}
+                                    className="w-16 h-16 object-cover rounded border"
+                                    onError={(e) => {
+                                      (
+                                        e.target as HTMLImageElement
+                                      ).style.display = "none";
+                                    }}
+                                  />
+                                </div>
+                              )}
+                              <div className="flex flex-col gap-1 flex-1 min-w-0">
+                                <strong>
+                                  {rowData.vehicleMake} {rowData.vehicleModel}
+                                </strong>
+                                {rowData.description && (
+                                  <div
+                                    className="text-xs text-gray-500 truncate max-w-xs"
+                                    title={rowData.description}
+                                  >
+                                    {rowData.description}
+                                  </div>
+                                )}
+                                {rowData.images &&
+                                  rowData.images.length > 1 && (
+                                    <div className="text-xs text-gray-400">
+                                      +{rowData.images.length - 1} more image
+                                      {rowData.images.length - 1 > 1 ? "s" : ""}
+                                    </div>
+                                  )}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{rowData.year}</TableCell>
+                          <TableCell>
+                            ₱{rowData.price?.toLocaleString()}
+                          </TableCell>
+                          <TableCell>
+                            {rowData.vehicleType ? (
+                              <Tag type="blue">{vehicleTypeName}</Tag>
+                            ) : (
+                              <span className="text-gray-400">N/A</span>
+                            )}
+                          </TableCell>
+                          <TableCell>{rowData.location || "N/A"}</TableCell>
+                          <TableCell>
+                            <OverflowMenu flipped>
+                              <OverflowMenuItem
+                                itemText="Edit"
+                                onClick={() => {
+                                  const originalVehicle = (rowData as any)
+                                    .originalVehicle as VehicleType;
+                                  if (originalVehicle)
+                                    openEdit(originalVehicle);
+                                }}
+                              />
+                              <OverflowMenuItem
+                                itemText="Delete"
+                                onClick={() => {
+                                  const originalVehicle = (rowData as any)
+                                    .originalVehicle as VehicleType;
+                                  if (originalVehicle)
+                                    openDelete(originalVehicle);
+                                }}
+                                isDelete
+                              />
+                            </OverflowMenu>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </TableBody>
+              </Table>
+              <Pagination
+                backwardText="Previous page"
+                forwardText="Next page"
+                itemsPerPageText="Items per page:"
+                page={page}
+                pageNumberText="Page Number"
+                pageSize={pageSize}
+                pageSizes={[10, 20, 30, 50, 100]}
+                totalItems={totalItems}
+                onChange={({ page, pageSize }) => {
+                  setPage(page);
+                  setPageSize(pageSize);
+                }}
+              />
+            </TableContainer>
+          );
+        }}
       </DataTable>
 
       <VehicleFormModal
@@ -371,7 +442,9 @@ export const Vehicle = () => {
           setCurrentVehicle(null);
         }}
         vehicleId={currentVehicle?.id || null}
-        vehicleName={`${currentVehicle?.vehicleMake} ${currentVehicle?.vehicleModel}`}
+        vehicleName={`${currentVehicle?.vehicle_make || ""} ${
+          currentVehicle?.vehicle_model || ""
+        }`}
       />
     </div>
   );

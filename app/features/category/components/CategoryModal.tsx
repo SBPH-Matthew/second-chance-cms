@@ -12,7 +12,7 @@ import {
     CreateCategoryRequest,
     CreateCategorySchema,
     ValidationResponse,
-    CategoryListType,
+    Category,
 } from "@/app/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -27,7 +27,7 @@ import { useQueryClient } from "@tanstack/react-query";
 interface CategoryModalProps {
     open: boolean;
     onClose: () => void;
-    category: CategoryListType | null;
+    category: Category | null;
 }
 
 export const CategoryModal = ({

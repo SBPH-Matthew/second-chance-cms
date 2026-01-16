@@ -4,10 +4,8 @@ import {
   getVehicleTypes,
   updateVehicleType,
 } from "@/app/services/api/vehicle-type.service";
-import {
-  VehicleTypeResponse,
-  ValidationResponse,
-} from "@/app/types/vehicle";
+import { ValidationResponse } from "@/app/types";
+import { VehicleTypeResponse } from "@/app/types/vehicle";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useGetVehicleTypes = () => {

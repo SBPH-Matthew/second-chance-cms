@@ -26,7 +26,7 @@ export const Login = () => {
     register,
   } = useForm<LoginRequestType>({
     resolver: zodResolver(LoginRequestSchema),
-    mode: "all",
+    mode: "onSubmit",
   });
 
   const onSubmit = (data: LoginRequestType) => {
@@ -34,7 +34,7 @@ export const Login = () => {
     loginPOST(data, {
       onSuccess: (data) => {
         console.log("success", data);
-        router.push("/dashboard"); // or wherever you want to redirect
+        router.push("/app");
       },
       onError: (error) => {
         // Set field-specific errors

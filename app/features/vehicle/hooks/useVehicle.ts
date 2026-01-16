@@ -6,20 +6,24 @@ import {
   PaginateVehiclesParams,
   updateVehicle,
 } from "@/app/services/api/vehicle.service";
+import { ResponseType, ValidationResponse } from "@/app/types";
 import {
   CreateVehicleRequest,
-  ResponseType,
-  ValidationResponse,
   VehicleTypeResponse,
 } from "@/app/types/vehicle";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export type HookPaginateVehicles = Omit<PaginateVehiclesParams, "signal">;
 
-export const usePaginateVehicles = ({ page, limit }: HookPaginateVehicles) => {
+export const usePaginateVehicles = ({
+  page,
+  limit,
+  search,
+}: HookPaginateVehicles) => {
   const { data, isPending, error } = useQuery({
-    queryKey: ["paginate-vehicles", page, limit],
-    queryFn: ({ signal }) => paginateVehicles({ page, limit, signal }),
+    queryKey: ["paginate-vehicles", page, limit, search],
+    queryFn: ({ signal }) =>
+      paginateVehicles({ page, limit, search, signal }),
   });
 
   return { data, isPending, error };

@@ -15,15 +15,10 @@ import {
   updateCategoryGroup,
   updateCategoryStatus,
   CreateCategoryGroupRequest,
-  CreateCategoryGroupResponse,
-  UpdateCategoryGroupResponse,
   CreateCategoryStatusRequest,
-  CreateCategoryStatusResponse,
-  UpdateCategoryStatusResponse,
 } from "@/app/services";
 import {
   CreateCategoryRequest,
-  CreateCategoryResponse,
   ResponseType,
   SetCategoryStatusRequest,
   ValidationResponse,
@@ -50,7 +45,7 @@ export const useGetCategoryStatuses = () => {
 
 export const useCreateCategory = () => {
   return useMutation<
-    CreateCategoryResponse,
+    ResponseType,
     ValidationResponse,
     CreateCategoryRequest
   >({
@@ -61,7 +56,7 @@ export const useCreateCategory = () => {
 
 export const useUpdateCategory = () => {
   return useMutation<
-    CreateCategoryResponse,
+    ResponseType,
     ValidationResponse,
     { id: number; payload: CreateCategoryRequest }
   >({
@@ -74,10 +69,11 @@ export type HookPaginateCategories = Omit<PaginateCategoriesParams, "signal">;
 export const usePaginateCategories = ({
   page,
   limit,
+  search,
 }: HookPaginateCategories) => {
   const { data, isPending, error } = useQuery({
-    queryKey: ["paginate-categories", page, limit],
-    queryFn: ({ signal }) => paginateCategories({ page, limit, signal }),
+    queryKey: ["paginate-categories", page, limit, search],
+    queryFn: ({ signal }) => paginateCategories({ page, limit, search, signal }),
   });
 
   return { data, isPending, error };
@@ -113,7 +109,7 @@ export const useSetCategoryStatus = () => {
 // Category Group hooks
 export const useCreateCategoryGroup = () => {
   return useMutation<
-    CreateCategoryGroupResponse,
+    ResponseType,
     ValidationResponse,
     CreateCategoryGroupRequest
   >({
@@ -124,7 +120,7 @@ export const useCreateCategoryGroup = () => {
 
 export const useUpdateCategoryGroup = () => {
   return useMutation<
-    UpdateCategoryGroupResponse,
+    ResponseType,
     ValidationResponse,
     { id: number; payload: CreateCategoryGroupRequest }
   >({
@@ -143,7 +139,7 @@ export const useDeleteCategoryGroup = () => {
 // Category Status hooks
 export const useCreateCategoryStatus = () => {
   return useMutation<
-    CreateCategoryStatusResponse,
+    ResponseType,
     ValidationResponse,
     CreateCategoryStatusRequest
   >({
@@ -154,7 +150,7 @@ export const useCreateCategoryStatus = () => {
 
 export const useUpdateCategoryStatus = () => {
   return useMutation<
-    UpdateCategoryStatusResponse,
+    ResponseType,
     ValidationResponse,
     { id: number; payload: CreateCategoryStatusRequest }
   >({

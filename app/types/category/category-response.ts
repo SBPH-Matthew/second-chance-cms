@@ -1,49 +1,50 @@
-export type GetCategoryGroupsResponse = {
-  message: string;
+import { ResponseType } from "../ResponseType";
+
+// Backend model types (snake_case from JSON tags)
+export interface Category {
+  id: number;
+  name: string;
+  status_id: number;
+  category_group_id: number;
+  status?: CategoryStatus;
+  category_group?: CategoryGroup;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
+}
+
+export interface CategoryGroup {
+  id: number;
+  name: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
+}
+
+export interface CategoryStatus {
+  id: number;
+  name: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
+}
+
+// Response types
+export interface GetCategoryGroupsResponse extends ResponseType {
   category_groups: CategoryGroup[];
-};
+}
 
-export type GetCategoryStatusesResponse = {
-  message: string;
+export interface GetCategoryStatusesResponse extends ResponseType {
   category_statuses: CategoryStatus[];
-};
+}
 
-export type CreateCategoryResponse = {
-  message: string;
-  category: {
-    id: number;
-    name: string;
-    status: string;
-    category_group: string;
-  };
-};
-
-export type CategoryPaginationResponse = {
-  message: string;
+export interface CategoryPaginationResponse extends ResponseType {
   categories: {
     total: number;
-    items: Array<CategoryListType>;
+    items: Category[];
   };
-};
+}
 
-export type GetAllCategoriesResponse = {
-  message: string;
-  categories: Array<CategoryListType>;
-};
-
-export type CategoryListType = {
-  id: number;
-  name: string;
-  status: number;
-  category_group: number;
-};
-
-export type CategoryGroup = {
-  id: number;
-  name: string;
-};
-
-export type CategoryStatus = {
-  id: number;
-  name: string;
-};
+export interface GetAllCategoriesResponse extends ResponseType {
+  categories: Category[];
+}

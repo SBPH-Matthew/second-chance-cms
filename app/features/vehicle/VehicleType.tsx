@@ -98,54 +98,58 @@ export const VehicleTypeComponent = () => {
               </Button>
             </TableToolbarContent>
           </TableToolbar>
-          {isEmpty ? (
-            <div className="flex flex-col items-start justify-center py-16 gap-4 ps-5! pt-5!">
-              <h3 className="text-xl font-semibold">No vehicle types yet</h3>
-              <p className="text-gray-500 max-w-md">
-                Vehicle types help categorize your vehicles. Create your first
-                vehicle type to get started.
-              </p>
-              <Button renderIcon={Add} onClick={handleOpenCreate}>
-                Add Vehicle Type
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableHeader>Vehicle Type Name</TableHeader>
-                    <TableHeader>Actions</TableHeader>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeader>Vehicle Type Name</TableHeader>
+                <TableHeader>Actions</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isEmpty ? (
+                <TableRow>
+                  <TableCell colSpan={2}>
+                    <div className="flex flex-col items-start justify-center gap-4 ps-5! py-5!">
+                      <h3 className="text-xl font-semibold">
+                        No vehicle types yet
+                      </h3>
+                      <p className="text-gray-500 max-w-md">
+                        Vehicle types help categorize your vehicles. Create
+                        your first vehicle type to get started.
+                      </p>
+                      <Button renderIcon={Add} onClick={handleOpenCreate}>
+                        Add Vehicle Type
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                vehicleTypesData?.vehicleTypes.items.map((vehicleType) => (
+                  <TableRow key={vehicleType.id}>
+                    <TableCell>{vehicleType.name}</TableCell>
+                    <TableCell>
+                      <OverflowMenu
+                        aria-label="actions"
+                        renderIcon={OverflowMenuHorizontal}
+                        flipped
+                      >
+                        <OverflowMenuItem
+                          itemText="Edit"
+                          onClick={() => handleOpenEdit(vehicleType)}
+                        />
+                        <OverflowMenuItem
+                          hasDivider
+                          itemText="Delete"
+                          isDelete
+                          onClick={() => handleOpenDelete(vehicleType)}
+                        />
+                      </OverflowMenu>
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {vehicleTypesData?.vehicleTypes.items.map((vehicleType) => (
-                    <TableRow key={vehicleType.id}>
-                      <TableCell>{vehicleType.name}</TableCell>
-                      <TableCell>
-                        <OverflowMenu
-                          aria-label="actions"
-                          renderIcon={OverflowMenuHorizontal}
-                          flipped
-                        >
-                          <OverflowMenuItem
-                            itemText="Edit"
-                            onClick={() => handleOpenEdit(vehicleType)}
-                          />
-                          <OverflowMenuItem
-                            hasDivider
-                            itemText="Delete"
-                            isDelete
-                            onClick={() => handleOpenDelete(vehicleType)}
-                          />
-                        </OverflowMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </>
-          )}
+                ))
+              )}
+            </TableBody>
+          </Table>
         </TableContainer>
       )}
     </section>

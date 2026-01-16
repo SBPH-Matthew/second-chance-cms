@@ -3,6 +3,7 @@ import {
   PaginateUsersResponse,
   UpdateUserPasswordSchema,
   UpdateUserSchema,
+  ResponseType,
 } from "@/app/types";
 
 export interface PaginateUserParams {
@@ -37,7 +38,7 @@ export const paginateUser = async ({
   return data;
 };
 
-export const createUser = async (payload: CreateUserSchema) => {
+export const createUser = async (payload: CreateUserSchema): Promise<ResponseType> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API}/user/`, {
     method: "POST",
     headers: {
@@ -62,7 +63,7 @@ export const updateUser = async ({
 }: {
   id: number;
   payload: UpdateUserSchema;
-}) => {
+}): Promise<ResponseType> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API}/user/${id}`, {
     method: "PUT",
     headers: {
@@ -87,7 +88,7 @@ export const changePassword = async ({
 }: {
   id: number;
   payload: UpdateUserPasswordSchema;
-}) => {
+}): Promise<ResponseType> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API}/user/${id}/password`,
     {
@@ -109,7 +110,7 @@ export const changePassword = async ({
   return data;
 };
 
-export const deleteUser = async (id: number) => {
+export const deleteUser = async (id: number): Promise<ResponseType> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API}/user/${id}`, {
     method: "DELETE",
     headers: {

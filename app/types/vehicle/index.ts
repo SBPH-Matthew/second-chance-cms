@@ -1,39 +1,35 @@
 import { z } from "zod";
+import { ResponseType } from "../ResponseType";
+import { User } from "../shared";
 
+// Backend model types (snake_case from JSON tags)
 export interface Vehicle {
   id: number;
-  vehicleMake: string;
-  vehicleModel: string;
+  vehicle_type_id?: number | null;
+  location: string;
   year: number;
+  vehicle_make: string;
+  vehicle_model: string;
   price: number;
   description: string;
-  location: string;
-  images?: string[];
-  vehicleTypeId?: number;
-  sellerId: number;
-  vehicleType?: VehicleType;
-  seller?: {
-    id: number;
-    name: string;
-    email: string;
-  };
-  createdAt?: string;
-  updatedAt?: string;
+  images: string[];
+  seller_id: number;
+  vehicle_type?: VehicleType;
+  seller?: User;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
 }
 
 export interface VehicleType {
   id: number;
   name: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
 }
 
-export interface VehicleTypeResponse {
-  message: string;
-  vehicleTypes: {
-    total: number;
-    items: VehicleType[];
-  };
-}
-
+// Request types (camelCase for frontend forms)
 export interface CreateVehicleRequest {
   vehicleMake: string;
   vehicleModel: string;
@@ -46,11 +42,18 @@ export interface CreateVehicleRequest {
   existingImages?: string[];
 }
 
-export interface VehiclePaginateResponse {
-  message: string;
+// Response types
+export interface VehiclePaginateResponse extends ResponseType {
   vehicles: {
     total: number;
     items: Vehicle[];
+  };
+}
+
+export interface VehicleTypeResponse extends ResponseType {
+  vehicleTypes: {
+    total: number;
+    items: VehicleType[];
   };
 }
 

@@ -98,54 +98,59 @@ export const ProductCondition = () => {
               </Button>
             </TableToolbarContent>
           </TableToolbar>
-          {isEmpty ? (
-            <div className="flex flex-col items-start justify-center py-16 gap-4 ps-5! pt-5!">
-              <h3 className="text-xl font-semibold">No product conditions yet</h3>
-              <p className="text-gray-500 max-w-md">
-                Product conditions help define the physical state of your products. Create your first
-                product condition to get started.
-              </p>
-              <Button renderIcon={Add} onClick={handleOpenCreate}>
-                Add Product Condition
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableHeader>Product Condition Name</TableHeader>
-                    <TableHeader>Actions</TableHeader>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeader>Product Condition Name</TableHeader>
+                <TableHeader>Actions</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isEmpty ? (
+                <TableRow>
+                  <TableCell colSpan={2}>
+                    <div className="flex flex-col items-start justify-center gap-4 ps-5! py-5!">
+                      <h3 className="text-xl font-semibold">
+                        No product conditions yet
+                      </h3>
+                      <p className="text-gray-500 max-w-md">
+                        Product conditions help define the physical state of
+                        your products. Create your first product condition to
+                        get started.
+                      </p>
+                      <Button renderIcon={Add} onClick={handleOpenCreate}>
+                        Add Product Condition
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                productConditionsData?.product_conditions.map((condition) => (
+                  <TableRow key={condition.id}>
+                    <TableCell>{condition.name}</TableCell>
+                    <TableCell>
+                      <OverflowMenu
+                        aria-label="actions"
+                        renderIcon={OverflowMenuHorizontal}
+                        flipped
+                      >
+                        <OverflowMenuItem
+                          itemText="Edit"
+                          onClick={() => handleOpenEdit(condition)}
+                        />
+                        <OverflowMenuItem
+                          hasDivider
+                          itemText="Delete"
+                          isDelete
+                          onClick={() => handleOpenDelete(condition)}
+                        />
+                      </OverflowMenu>
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {productConditionsData?.product_conditions.map((condition) => (
-                    <TableRow key={condition.id}>
-                      <TableCell>{condition.name}</TableCell>
-                      <TableCell>
-                        <OverflowMenu
-                          aria-label="actions"
-                          renderIcon={OverflowMenuHorizontal}
-                          flipped
-                        >
-                          <OverflowMenuItem
-                            itemText="Edit"
-                            onClick={() => handleOpenEdit(condition)}
-                          />
-                          <OverflowMenuItem
-                            hasDivider
-                            itemText="Delete"
-                            isDelete
-                            onClick={() => handleOpenDelete(condition)}
-                          />
-                        </OverflowMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </>
-          )}
+                ))
+              )}
+            </TableBody>
+          </Table>
         </TableContainer>
       )}
     </section>

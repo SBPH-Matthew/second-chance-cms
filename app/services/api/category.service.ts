@@ -1,11 +1,11 @@
 import {
   CategoryPaginationResponse,
   CreateCategoryRequest,
-  CreateCategoryResponse,
   GetAllCategoriesResponse,
   GetCategoryGroupsResponse,
   GetCategoryStatusesResponse,
   SetCategoryStatusRequest,
+  ResponseType,
 } from "@/app/types";
 
 export const getCategoryGroups = async (
@@ -56,7 +56,7 @@ export const getCategoryStatuses = async (
 
 export const createCategory = async (
   payload: CreateCategoryRequest,
-): Promise<CreateCategoryResponse> => {
+): Promise<ResponseType> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API}/category/`, {
     method: "POST",
     headers: {
@@ -81,7 +81,7 @@ export const updateCategory = async ({
 }: {
   id: number;
   payload: CreateCategoryRequest;
-}) => {
+}): Promise<ResponseType> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API}/category/${id}`,
     {
@@ -106,16 +106,19 @@ export const updateCategory = async ({
 export interface PaginateCategoriesParams {
   page: number;
   limit: number;
+  search?: string;
   signal?: AbortSignal;
 }
 
 export const paginateCategories = async ({
   page,
   limit,
+  search,
   signal,
 }: PaginateCategoriesParams): Promise<CategoryPaginationResponse> => {
+  const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API}/category/?page=${page}&limit=${limit}`,
+    `${process.env.NEXT_PUBLIC_API}/category/?page=${page}&limit=${limit}${searchParam}`,
     {
       method: "GET",
       headers: {
@@ -159,7 +162,7 @@ export const getAllCategories = async (
   return data;
 };
 
-export const deleteCategory = async (id: number) => {
+export const deleteCategory = async (id: number): Promise<ResponseType> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API}/category/${id}`,
     {
@@ -183,7 +186,7 @@ export const deleteCategory = async (id: number) => {
 export const setCategoryStatus = async ({
   id,
   status,
-}: SetCategoryStatusRequest) => {
+}: SetCategoryStatusRequest): Promise<ResponseType> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API}/category/${id}/status`,
     {
@@ -210,25 +213,9 @@ export interface CreateCategoryGroupRequest {
   name: string;
 }
 
-export interface CreateCategoryGroupResponse {
-  message: string;
-  category_group: {
-    id: number;
-    name: string;
-  };
-}
-
-export interface UpdateCategoryGroupResponse {
-  message: string;
-  category_group: {
-    id: number;
-    name: string;
-  };
-}
-
 export const createCategoryGroup = async (
   payload: CreateCategoryGroupRequest,
-): Promise<CreateCategoryGroupResponse> => {
+): Promise<ResponseType> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API}/category-group/`,
     {
@@ -256,7 +243,7 @@ export const updateCategoryGroup = async ({
 }: {
   id: number;
   payload: CreateCategoryGroupRequest;
-}): Promise<UpdateCategoryGroupResponse> => {
+}): Promise<ResponseType> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API}/category-group/${id}`,
     {
@@ -304,25 +291,9 @@ export interface CreateCategoryStatusRequest {
   name: string;
 }
 
-export interface CreateCategoryStatusResponse {
-  message: string;
-  category_status: {
-    id: number;
-    name: string;
-  };
-}
-
-export interface UpdateCategoryStatusResponse {
-  message: string;
-  category_status: {
-    id: number;
-    name: string;
-  };
-}
-
 export const createCategoryStatus = async (
   payload: CreateCategoryStatusRequest,
-): Promise<CreateCategoryStatusResponse> => {
+): Promise<ResponseType> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API}/category-status/`,
     {
@@ -350,7 +321,7 @@ export const updateCategoryStatus = async ({
 }: {
   id: number;
   payload: CreateCategoryStatusRequest;
-}): Promise<UpdateCategoryStatusResponse> => {
+}): Promise<ResponseType> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API}/category-status/${id}`,
     {
@@ -372,7 +343,7 @@ export const updateCategoryStatus = async ({
   return data;
 };
 
-export const deleteCategoryStatus = async (id: number) => {
+export const deleteCategoryStatus = async (id: number): Promise<ResponseType> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API}/category-status/${id}`,
     {

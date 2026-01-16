@@ -1,24 +1,26 @@
 import {
   CreateProductRequest,
-  CreateProductResponse,
-  ProductDetailsResponse,
   ProductPaginationResponse,
   ResponseType,
+  Product,
 } from "@/app/types";
 
 export interface PaginateProductsParams {
   page: number;
   limit: number;
+  search?: string;
   signal?: AbortSignal;
 }
 
 export const paginateProducts = async ({
   page,
   limit,
+  search,
   signal,
 }: PaginateProductsParams): Promise<ProductPaginationResponse> => {
+  const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API}/product/?page=${page}&limit=${limit}`,
+    `${process.env.NEXT_PUBLIC_API}/product/?page=${page}&limit=${limit}${searchParam}`,
     {
       method: "GET",
       headers: {
@@ -196,7 +198,7 @@ export const deleteProduct = async (id: number): Promise<ResponseType> => {
 
 export const getProductDetails = async (
   id: number,
-): Promise<ProductDetailsResponse> => {
+): Promise<{ message: string; product: Product }> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API}/product/${id}`, {
     method: "GET",
     headers: {

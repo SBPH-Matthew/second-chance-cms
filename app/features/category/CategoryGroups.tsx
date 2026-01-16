@@ -98,54 +98,58 @@ export const CategoryGroups = () => {
               </Button>
             </TableToolbarContent>
           </TableToolbar>
-          {isEmpty ? (
-            <div className="flex flex-col items-start justify-center py-16 gap-4 ps-5! pt-5!">
-              <h3 className="text-xl font-semibold">No category groups yet</h3>
-              <p className="text-gray-500 max-w-md">
-                Category groups help organize your categories. Create your first
-                category group to get started.
-              </p>
-              <Button renderIcon={Add} onClick={handleOpenCreate}>
-                Add Category Group
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableHeader>Category Group Name</TableHeader>
-                    <TableHeader>Actions</TableHeader>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeader>Category Group Name</TableHeader>
+                <TableHeader>Actions</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {isEmpty ? (
+                <TableRow>
+                  <TableCell colSpan={2}>
+                    <div className="flex flex-col items-start justify-center gap-4 ps-5! py-5!">
+                      <h3 className="text-xl font-semibold">
+                        No category groups yet
+                      </h3>
+                      <p className="text-gray-500 max-w-md">
+                        Category groups help organize your categories. Create
+                        your first category group to get started.
+                      </p>
+                      <Button renderIcon={Add} onClick={handleOpenCreate}>
+                        Add Category Group
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                categoryGroupsData?.category_groups.map((group) => (
+                  <TableRow key={group.id}>
+                    <TableCell>{group.name}</TableCell>
+                    <TableCell>
+                      <OverflowMenu
+                        aria-label="actions"
+                        renderIcon={OverflowMenuHorizontal}
+                        flipped
+                      >
+                        <OverflowMenuItem
+                          itemText="Edit"
+                          onClick={() => handleOpenEdit(group)}
+                        />
+                        <OverflowMenuItem
+                          hasDivider
+                          itemText="Delete"
+                          isDelete
+                          onClick={() => handleOpenDelete(group)}
+                        />
+                      </OverflowMenu>
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {categoryGroupsData?.category_groups.map((group) => (
-                    <TableRow key={group.id}>
-                      <TableCell>{group.name}</TableCell>
-                      <TableCell>
-                        <OverflowMenu
-                          aria-label="actions"
-                          renderIcon={OverflowMenuHorizontal}
-                          flipped
-                        >
-                          <OverflowMenuItem
-                            itemText="Edit"
-                            onClick={() => handleOpenEdit(group)}
-                          />
-                          <OverflowMenuItem
-                            hasDivider
-                            itemText="Delete"
-                            isDelete
-                            onClick={() => handleOpenDelete(group)}
-                          />
-                        </OverflowMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </>
-          )}
+                ))
+              )}
+            </TableBody>
+          </Table>
         </TableContainer>
       )}
     </section>

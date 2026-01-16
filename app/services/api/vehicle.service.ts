@@ -8,16 +8,27 @@ import {
 export interface PaginateVehiclesParams {
   page: number;
   limit: number;
+  search?: string;
   signal?: AbortSignal;
 }
 
 export const paginateVehicles = async ({
   page,
   limit,
+  search,
   signal,
 }: PaginateVehiclesParams): Promise<VehiclePaginateResponse> => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+
+  if (search && search.trim()) {
+    params.append("search", search.trim());
+  }
+
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API}/vehicle/?page=${page}&limit=${limit}`,
+    `${process.env.NEXT_PUBLIC_API}/vehicle/?${params.toString()}`,
     {
       method: "GET",
       headers: {

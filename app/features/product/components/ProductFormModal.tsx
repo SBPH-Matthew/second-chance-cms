@@ -18,7 +18,7 @@ import {
   CreateProductRequest,
   CreateProductSchema,
   Product,
-  ProductCategory,
+  Category,
   ProductCondition,
   ProductStatus,
 } from "@/app/types/product";
@@ -49,7 +49,7 @@ export const ProductFormModal = ({
   conditions,
   statuses,
 }: ProductFormModalProps) => {
-  const [files, setFiles] = useState<{ id: string; file: File }[]>([]);
+  const [files, setFiles] = useState<{ id: string; file: File; preview: string }[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const {
@@ -75,9 +75,9 @@ export const ProductFormModal = ({
           name: initialData.name,
           description: initialData.description,
           price: initialData.price,
-          category: initialData.category?.ID?.toString() || "",
-          condition: initialData.condition?.ID?.toString() || "",
-          status: initialData.status?.ID?.toString() || "",
+          category: initialData.category_id?.toString() || initialData.category?.id?.toString() || "",
+          condition: initialData.product_condition_id?.toString() || initialData.product_condition?.id?.toString() || "",
+          status: initialData.status_id?.toString() || initialData.status?.id?.toString() || "",
         };
         console.log(
           "[ProductFormModal] Resetting form with initial data:",
@@ -86,7 +86,8 @@ export const ProductFormModal = ({
         reset(initialValues);
         // Set existing images
         setExistingImages(initialData.images || []);
-        // Reset new file selections
+        // Reset new file selections and revoke any existing preview URLs
+        files.forEach((file) => URL.revokeObjectURL(file.preview));
         setFiles([]);
         setValue("images", []);
       } else {
@@ -103,8 +104,9 @@ export const ProductFormModal = ({
           emptyValues
         );
         reset(emptyValues);
-        // Reset file selections
+        // Reset file selections and revoke any existing preview URLs
         setExistingImages([]);
+        files.forEach((file) => URL.revokeObjectURL(file.preview));
         setFiles([]);
         setValue("images", []);
       }
@@ -119,10 +121,19 @@ export const ProductFormModal = ({
         status: "",
       });
       setExistingImages([]);
+      // Revoke all object URLs before clearing files
+      files.forEach((file) => URL.revokeObjectURL(file.preview));
       setFiles([]);
       setValue("images", []);
     }
   }, [open, initialData, reset, setValue]);
+
+  // Cleanup: Revoke object URLs when component unmounts or files change
+  useEffect(() => {
+    return () => {
+      files.forEach((file) => URL.revokeObjectURL(file.preview));
+    };
+  }, []);
 
   // Debug: Log form values when they change
   useEffect(() => {
@@ -135,6 +146,7 @@ export const ProductFormModal = ({
       const newFileEntries = uploadedFiles.map((file) => ({
         id: `${Date.now()}-${Math.random()}`,
         file,
+        preview: URL.createObjectURL(file),
       }));
       const updatedFiles = [...files, ...newFileEntries];
       setFiles(updatedFiles);
@@ -146,6 +158,11 @@ export const ProductFormModal = ({
   };
 
   const handleFileDelete = (fileId: string) => {
+    const fileToDelete = files.find((entry) => entry.id === fileId);
+    if (fileToDelete) {
+      // Revoke object URL to prevent memory leaks
+      URL.revokeObjectURL(fileToDelete.preview);
+    }
     const newFiles = files.filter((entry) => entry.id !== fileId);
     setFiles(newFiles);
     setValue(
@@ -283,12 +300,12 @@ export const ProductFormModal = ({
             >
               <SelectItem value="" text="Select a condition" />
               {conditions
-                .filter((cond) => cond.ID !== undefined)
+                .filter((cond) => cond.id !== undefined)
                 .map((cond) => (
                   <SelectItem
-                    key={cond.ID!}
-                    value={cond.ID!.toString()}
-                    text={cond.Name || ""}
+                    key={cond.id!}
+                    value={cond.id!.toString()}
+                    text={cond.name || ""}
                   />
                 ))}
             </Select>
@@ -313,12 +330,12 @@ export const ProductFormModal = ({
             >
               <SelectItem value="" text="Select a status" />
               {statuses
-                .filter((stat) => stat.ID !== undefined)
+                .filter((stat) => stat.id !== undefined)
                 .map((stat) => (
                   <SelectItem
-                    key={stat.ID!}
-                    value={stat.ID!.toString()}
-                    text={stat.Name || ""}
+                    key={stat.id!}
+                    value={stat.id!.toString()}
+                    text={stat.name || ""}
                   />
                 ))}
             </Select>
@@ -370,19 +387,32 @@ export const ProductFormModal = ({
               </div>
             )}
 
-            {/* Show new file uploads */}
+            {/* Show new file uploads with preview */}
             {files.length > 0 && (
-              <div className="mt-2">
+              <div className="mt-4">
                 <p className="text-sm font-medium mb-2">New Images</p>
-                <div className="space-y-2">
+                <div className="grid grid-cols-4 gap-2">
                   {files.map((fileEntry) => (
-                    <FileUploaderItem
-                      key={fileEntry.id}
-                      name={fileEntry.file.name}
-                      status="complete"
-                      onDelete={() => handleFileDelete(fileEntry.id)}
-                      iconDescription="Remove"
-                    />
+                    <div key={fileEntry.id} className="relative group aspect-square">
+                      <img
+                        src={fileEntry.preview}
+                        alt={fileEntry.file.name}
+                        className="w-full h-full object-cover rounded border"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                      <Button
+                        kind="danger"
+                        size="sm"
+                        hasIconOnly
+                        iconDescription="Delete image"
+                        className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleFileDelete(fileEntry.id)}
+                      >
+                        <Close size={16} />
+                      </Button>
+                    </div>
                   ))}
                 </div>
               </div>

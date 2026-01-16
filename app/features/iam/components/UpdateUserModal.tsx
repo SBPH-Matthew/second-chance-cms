@@ -23,23 +23,12 @@ import {
     updateUserSchema,
     UpdateUserPasswordSchema,
     updateUserPassword,
+    User,
 } from "@/app/types";
 import { useUpdateUser, useChangePassword } from "../hooks/useIam";
 import { useGetRoles } from "../../roles";
 import { useModalLoading } from "@/app/hooks";
 import { useEffect, useState } from "react";
-
-// Define a minimal User interface based on usage if not imported
-interface User {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    role: {
-        id: number;
-        name: string;
-    };
-}
 
 interface UpdateUserModalProps {
     open: boolean;
@@ -107,7 +96,7 @@ export const UpdateUserModal = ({ open, onClose, user }: UpdateUserModalProps) =
                 first_name: user.first_name,
                 last_name: user.last_name,
                 email: user.email,
-                role: String(user.role.id),
+                role: String(user.role?.id || user.role_id || ""),
             });
         } else if (!open) {
             // Reset everything on close
