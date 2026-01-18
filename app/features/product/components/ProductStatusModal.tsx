@@ -9,7 +9,7 @@ import {
 } from "../hooks";
 import { useModalLoading } from "@/app/hooks";
 import { useQueryClient } from "@tanstack/react-query";
-import { ProductStatusResponse } from "@/app/types/product";
+import { ProductStatus } from "@/app/types/product";
 import { ValidationResponse } from "@/app/types";
 
 const CreateProductStatusSchema = z.object({
@@ -21,7 +21,7 @@ type CreateProductStatusRequest = z.infer<typeof CreateProductStatusSchema>;
 interface ProductStatusModalProps {
   open: boolean;
   onClose: () => void;
-  productStatus: ProductStatusResponse | null;
+  productStatus: ProductStatus | null;
 }
 
 export const ProductStatusModal = ({

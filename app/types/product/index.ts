@@ -9,6 +9,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  location: string;
   images: string[];
   category_id: number;
   status_id: number;
@@ -44,6 +45,7 @@ export const CreateProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
   price: z.number().min(0, "Price must be positive"),
+  location: z.string().min(1, "Location is required"),
   category: z.string().min(1, "Category is required"),
   condition: z.string().min(1, "Condition is required"),
   status: z.string().min(1, "Status is required"),

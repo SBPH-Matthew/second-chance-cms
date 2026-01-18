@@ -1,5 +1,5 @@
 "use client";
-import { ContentLayout } from "@/app/components";
+import { CarbonLink, ContentLayout, SignOutModal } from "@/app/components";
 import {
   Category as CaCategory,
   Dashboard as DashboardIcon,
@@ -12,6 +12,7 @@ import {
   User,
   Settings,
   Logout,
+  ArrowRight,
 } from "@carbon/icons-react";
 import {
   Header,
@@ -50,6 +51,7 @@ export const DashboardLayout = ({
   const router = useRouter();
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [signOutModalOpen, setSignOutModalOpen] = useState(false);
   const notificationToggleRef = useRef(false);
   const userMenuToggleRef = useRef(false);
 
@@ -101,6 +103,10 @@ export const DashboardLayout = ({
   };
 
   const handleLogout = async () => {
+    setSignOutModalOpen(true);
+  };
+
+  const handleSignOutConfirm = async () => {
     try {
       // Call logout endpoint if it exists
       const response = await fetch(`${process.env.NEXT_PUBLIC_API}/logout`, {
@@ -110,6 +116,7 @@ export const DashboardLayout = ({
 
       // Even if logout endpoint fails, clear local state and redirect
       // Clear any local storage or cookies if needed
+      setSignOutModalOpen(false);
       setUserMenuOpen(false);
 
       // Redirect to login page
@@ -117,9 +124,14 @@ export const DashboardLayout = ({
     } catch (error) {
       console.error("Logout error:", error);
       // Still redirect even if logout fails
+      setSignOutModalOpen(false);
       setUserMenuOpen(false);
       router.push("/login");
     }
+  };
+
+  const handleSignOutCancel = () => {
+    setSignOutModalOpen(false);
   };
 
   // Format timestamp to relative time
@@ -150,8 +162,8 @@ export const DashboardLayout = ({
                 isActive={isSideNavExpanded}
                 aria-expanded={isSideNavExpanded}
               />
-              <HeaderName href="#" prefix="Second Chance">
-                [CMS]
+              <HeaderName href="/dashboard/app" prefix="">
+                Second Chance CMS
               </HeaderName>
               <SideNav
                 aria-label="Side navigation"
@@ -162,8 +174,8 @@ export const DashboardLayout = ({
                 <SideNavItems>
                   <SideNavLink
                     as={Link}
-                    href="/app"
-                    isActive={pathname === "/app"}
+                    href="/dashboard"
+                    isActive={pathname === "/dashboard/app"}
                     renderIcon={DashboardIcon}
                     large
                   >
@@ -172,38 +184,42 @@ export const DashboardLayout = ({
                   <SideNavMenu renderIcon={CaCategory} title="Category" large>
                     <SideNavMenuItem
                       as={Link}
-                      href="/category"
-                      isActive={pathname === "/category"}
+                      href="/dashboard/category"
+                      isActive={pathname === "/dashboard/category"}
                     >
                       Manage Categories
                     </SideNavMenuItem>
                     <SideNavMenuItem
                       as={Link}
-                      href="/category/groups"
-                      isActive={pathname === "/category/groups"}
+                      href="/dashboard/category/groups"
+                      isActive={pathname === "/dashboard/category/groups"}
                     >
                       Category Groups
                     </SideNavMenuItem>
                     <SideNavMenuItem
                       as={Link}
-                      href="/category/status"
-                      isActive={pathname === "/category/status"}
+                      href="/dashboard/category/status"
+                      isActive={pathname === "/dashboard/category/status"}
                     >
                       Category Status
                     </SideNavMenuItem>
                   </SideNavMenu>
-                  <SideNavMenu renderIcon={GroupAccess} title="IAM" large>
+                  <SideNavMenu
+                    renderIcon={GroupAccess}
+                    title="Access (IAM)"
+                    large
+                  >
                     <SideNavMenuItem
                       as={Link}
-                      href="/user"
-                      isActive={pathname === "/user"}
+                      href="/dashboard/user"
+                      isActive={pathname === "/dashboard/user"}
                     >
                       User
                     </SideNavMenuItem>
                     <SideNavMenuItem
                       as={Link}
-                      href="/role"
-                      isActive={pathname === "/role"}
+                      href="/dashboard/role"
+                      isActive={pathname === "/dashboard/role"}
                     >
                       Role
                     </SideNavMenuItem>
@@ -211,22 +227,22 @@ export const DashboardLayout = ({
                   <SideNavMenu renderIcon={Product} title="Products" large>
                     <SideNavMenuItem
                       as={Link}
-                      href="/product"
-                      isActive={pathname === "/product"}
+                      href="/dashboard/product"
+                      isActive={pathname === "/dashboard/product"}
                     >
                       Manage Products
                     </SideNavMenuItem>
                     <SideNavMenuItem
                       as={Link}
-                      href="/product/status"
-                      isActive={pathname === "/product/status"}
+                      href="/dashboard/product/status"
+                      isActive={pathname === "/dashboard/product/status"}
                     >
                       Product Status
                     </SideNavMenuItem>
                     <SideNavMenuItem
                       as={Link}
-                      href="/product/condition"
-                      isActive={pathname === "/product/condition"}
+                      href="/dashboard/product/condition"
+                      isActive={pathname === "/dashboard/product/condition"}
                     >
                       Product Condition
                     </SideNavMenuItem>
@@ -234,15 +250,15 @@ export const DashboardLayout = ({
                   <SideNavMenu renderIcon={VehicleApi} title="Vehicles" large>
                     <SideNavMenuItem
                       as={Link}
-                      href="/vehicle"
-                      isActive={pathname === "/vehicle"}
+                      href="/dashboard/vehicle"
+                      isActive={pathname === "/dashboard/vehicle"}
                     >
                       Manage Vehicles
                     </SideNavMenuItem>
                     <SideNavMenuItem
                       as={Link}
-                      href="/vehicle/type"
-                      isActive={pathname === "/vehicle/type"}
+                      href="/dashboard/vehicle/type"
+                      isActive={pathname === "/dashboard/vehicle/type"}
                     >
                       Vehicle Type
                     </SideNavMenuItem>
@@ -252,7 +268,8 @@ export const DashboardLayout = ({
               <HeaderGlobalBar>
                 <Popover
                   align="bottom-end"
-                  caret
+                  caret={false}
+                  isTabTip
                   dropShadow
                   open={notificationOpen}
                   border
@@ -348,13 +365,13 @@ export const DashboardLayout = ({
                                       </p>
                                       <p className="text-xs! text-gray-400! dark:text-gray-500! m-0!">
                                         {formatTimestamp(
-                                          notification.created_at
+                                          notification.created_at,
                                         )}
                                       </p>
                                     </div>
                                   </div>
                                 </li>
-                              )
+                              ),
                             )}
                           </ul>
                         )}
@@ -367,7 +384,7 @@ export const DashboardLayout = ({
                             kind="ghost"
                             size="sm"
                             as={Link}
-                            href="/notifications"
+                            href="/dashboard/notifications"
                             onClick={handleNotificationClose}
                           >
                             View all notifications
@@ -380,10 +397,11 @@ export const DashboardLayout = ({
 
                 <Popover
                   align="bottom-end"
-                  caret
                   dropShadow
+                  caret={false}
                   open={userMenuOpen}
                   border
+                  isTabTip
                   onRequestClose={() => {
                     // Don't close if we're in the middle of a button toggle
                     if (!userMenuToggleRef.current) {
@@ -406,57 +424,39 @@ export const DashboardLayout = ({
                   <PopoverContent className="p-0!">
                     <div
                       id="user-menu-popover"
-                      className="w-64!"
-                      style={{ minWidth: "256px" }}
+                      className="w-64! pb-0!"
+                      style={{ minWidth: "256px", paddingBottom: "0" }}
                       role="dialog"
                       aria-label="User Menu"
                     >
                       {/* Header */}
-                      <div className="flex! items-center! gap-3! p-4! border-b! border-gray-200! dark:border-gray-700!">
-                        <div className="flex! items-center! justify-center! w-10! h-10! rounded-full! bg-blue-500! text-white!">
-                          <UserAvatar size={20} />
+                      <div className="flex items-center gap-3 px-4! pt-6! pb-4!">
+                        <div>
+                          <p className="text-xl!" style={{ fontWeight: 400 }}>
+                            Matthew Andre Butalid
+                          </p>
                         </div>
-                        <div className="flex-1! min-w-0!">
-                          <p className="text-sm! font-semibold! text-gray-900! dark:text-gray-100! m-0! truncate!">
-                            User Account
-                          </p>
-                          <p className="text-xs! text-gray-500! dark:text-gray-400! m-0! truncate!">
-                            Administrator
-                          </p>
+                        <div className="rounded-full! p-4! bg-[#393939]!">
+                          <User size={28} />
                         </div>
                       </div>
 
                       {/* Menu Items */}
-                      <div className="py-2!">
-                        <button
-                          className="w-full! flex! items-center! gap-3! px-4! py-3! text-left! text-gray-900! dark:text-gray-100! hover:bg-gray-100! dark:hover:bg-gray-800! transition-colors! border-none! bg-transparent! cursor-pointer! no-underline!"
-                          onClick={() => {
-                            setUserMenuOpen(false);
-                            // TODO: Navigate to profile page
-                          }}
-                        >
-                          <User size={16} />
-                          <span className="text-sm!">My Profile</span>
-                        </button>
-                        <button
-                          className="w-full! flex! items-center! gap-3! px-4! py-3! text-left! text-gray-900! dark:text-gray-100! hover:bg-gray-100! dark:hover:bg-gray-800! transition-colors! border-none! bg-transparent! cursor-pointer! no-underline!"
-                          onClick={() => {
-                            setUserMenuOpen(false);
-                            // TODO: Navigate to settings page
-                          }}
-                        >
-                          <Settings size={16} />
-                          <span className="text-sm!">Settings</span>
-                        </button>
-                        <div className="border-t! border-gray-200! dark:border-gray-700! my-2!"></div>
-                        <button
-                          className="w-full! flex! items-center! gap-3! px-4! py-3! text-left! text-red-600! dark:text-red-400! hover:bg-red-50! dark:hover:bg-red-900/20! transition-colors! border-none! bg-transparent! cursor-pointer! no-underline!"
-                          onClick={handleLogout}
-                        >
-                          <Logout size={16} />
-                          <span className="text-sm!">Logout</span>
-                        </button>
-                      </div>
+                      <Button className="w-full!" kind="ghost">
+                        Profile
+                      </Button>
+                      <Button className="w-full!" kind="ghost">
+                        Settings
+                      </Button>
+                      <Button
+                        className="w-full!"
+                        kind="secondary"
+                        onClick={handleLogout}
+                      >
+                        <span className="flex! items-center! gap-2!">
+                          Log out <ArrowRight size={15} />
+                        </span>
+                      </Button>
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -466,6 +466,12 @@ export const DashboardLayout = ({
             <ContentLayout className="p-0! min-h-screen!">
               {children}
             </ContentLayout>
+
+            <SignOutModal
+              open={signOutModalOpen}
+              onClose={handleSignOutCancel}
+              onConfirm={handleSignOutConfirm}
+            />
           </>
         )}
       />

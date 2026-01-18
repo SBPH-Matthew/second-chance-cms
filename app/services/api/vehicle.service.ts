@@ -2,8 +2,8 @@ import {
   CreateVehicleRequest,
   VehiclePaginateResponse,
   VehicleTypeResponse,
-  ResponseType,
 } from "@/app/types/vehicle";
+import { ResponseType } from "@/app/types/ResponseType";
 
 export interface PaginateVehiclesParams {
   page: number;

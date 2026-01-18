@@ -18,10 +18,10 @@ import {
   CreateProductRequest,
   CreateProductSchema,
   Product,
-  Category,
   ProductCondition,
   ProductStatus,
 } from "@/app/types/product";
+import { Category } from "@/app/types/category";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -49,7 +49,9 @@ export const ProductFormModal = ({
   conditions,
   statuses,
 }: ProductFormModalProps) => {
-  const [files, setFiles] = useState<{ id: string; file: File; preview: string }[]>([]);
+  const [files, setFiles] = useState<
+    { id: string; file: File; preview: string }[]
+  >([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const {
@@ -75,13 +77,23 @@ export const ProductFormModal = ({
           name: initialData.name,
           description: initialData.description,
           price: initialData.price,
-          category: initialData.category_id?.toString() || initialData.category?.id?.toString() || "",
-          condition: initialData.product_condition_id?.toString() || initialData.product_condition?.id?.toString() || "",
-          status: initialData.status_id?.toString() || initialData.status?.id?.toString() || "",
+          location: initialData.location,
+          category:
+            initialData.category_id?.toString() ||
+            initialData.category?.id?.toString() ||
+            "",
+          condition:
+            initialData.product_condition_id?.toString() ||
+            initialData.product_condition?.id?.toString() ||
+            "",
+          status:
+            initialData.status_id?.toString() ||
+            initialData.status?.id?.toString() ||
+            "",
         };
         console.log(
           "[ProductFormModal] Resetting form with initial data:",
-          initialValues
+          initialValues,
         );
         reset(initialValues);
         // Set existing images
@@ -95,13 +107,14 @@ export const ProductFormModal = ({
           name: "",
           description: "",
           price: 0,
+          location: "",
           category: "",
           condition: "",
           status: "",
         };
         console.log(
           "[ProductFormModal] Resetting form with empty values:",
-          emptyValues
+          emptyValues,
         );
         reset(emptyValues);
         // Reset file selections and revoke any existing preview URLs
@@ -116,6 +129,7 @@ export const ProductFormModal = ({
         name: "",
         description: "",
         price: 0,
+        location: "",
         category: "",
         condition: "",
         status: "",
@@ -152,7 +166,7 @@ export const ProductFormModal = ({
       setFiles(updatedFiles);
       setValue(
         "images",
-        updatedFiles.map((entry) => entry.file)
+        updatedFiles.map((entry) => entry.file),
       );
     }
   };
@@ -167,7 +181,7 @@ export const ProductFormModal = ({
     setFiles(newFiles);
     setValue(
       "images",
-      newFiles.map((entry) => entry.file)
+      newFiles.map((entry) => entry.file),
     );
   };
 
@@ -176,10 +190,10 @@ export const ProductFormModal = ({
   };
 
   const getImageUrl = (imagePath: string) => {
-    if (imagePath.startsWith('http')) {
+    if (imagePath.startsWith("http")) {
       return imagePath;
     }
-    const apiUrl = process.env.NEXT_PUBLIC_API || '';
+    const apiUrl = process.env.NEXT_PUBLIC_API || "";
     return `${apiUrl}${imagePath}`;
   };
 
@@ -187,11 +201,11 @@ export const ProductFormModal = ({
     console.log("[ProductFormModal] Form submitted with data:", data);
     console.log(
       "[ProductFormModal] Current watched values before submit:",
-      watchedValues
+      watchedValues,
     );
     console.log(
       "[ProductFormModal] Condition value in payload:",
-      data.condition
+      data.condition,
     );
     console.log("[ProductFormModal] Status value in payload:", data.status);
     // Include selected files and existing images to keep
@@ -254,6 +268,15 @@ export const ProductFormModal = ({
             )}
           />
 
+          <TextInput
+            id="location"
+            labelText="Location"
+            placeholder="Enter product location"
+            {...register("location")}
+            invalid={!!errors.location}
+            invalidText={errors.location?.message}
+          />
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Controller
               control={control}
@@ -291,7 +314,7 @@ export const ProductFormModal = ({
                       event: e,
                       targetValue: e.target?.value,
                       currentFormValue: watchedValues.condition,
-                    }
+                    },
                   );
                 },
               })}
@@ -321,7 +344,7 @@ export const ProductFormModal = ({
                       event: e,
                       targetValue: e.target?.value,
                       currentFormValue: watchedValues.status,
-                    }
+                    },
                   );
                 },
               })}
@@ -343,7 +366,11 @@ export const ProductFormModal = ({
 
           <div className="flex flex-col gap-2">
             <FileUploader
-              key={open ? `uploader-${initialData?.id || 'new'}` : 'uploader-closed'}
+              key={
+                open
+                  ? `uploader-${initialData?.id || "new"}`
+                  : "uploader-closed"
+              }
               accept={["image/*"]}
               buttonKind="primary"
               buttonLabel="Add images"
@@ -355,7 +382,7 @@ export const ProductFormModal = ({
               onChange={handleFileUpload}
               size="md"
             />
-            
+
             {/* Show existing images when editing */}
             {initialData && existingImages.length > 0 && (
               <div className="mt-4">
@@ -368,7 +395,7 @@ export const ProductFormModal = ({
                         alt={`Product image ${index + 1}`}
                         className="w-full h-full object-cover rounded border"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
+                          (e.target as HTMLImageElement).style.display = "none";
                         }}
                       />
                       <Button
@@ -393,13 +420,16 @@ export const ProductFormModal = ({
                 <p className="text-sm font-medium mb-2">New Images</p>
                 <div className="grid grid-cols-4 gap-2">
                   {files.map((fileEntry) => (
-                    <div key={fileEntry.id} className="relative group aspect-square">
+                    <div
+                      key={fileEntry.id}
+                      className="relative group aspect-square"
+                    >
                       <img
                         src={fileEntry.preview}
                         alt={fileEntry.file.name}
                         className="w-full h-full object-cover rounded border"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
+                          (e.target as HTMLImageElement).style.display = "none";
                         }}
                       />
                       <Button

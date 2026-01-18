@@ -15,7 +15,7 @@ const plexSans = IBM_Plex_Sans({
 // Configure IBM Plex Mono
 const plexMono = IBM_Plex_Mono({
     subsets: ["latin"],
-    weight: ["300", "400"],
+    weight: ["100", "200", "300", "400", "500", "600", "700"],
     display: "swap",
     variable: "--cds-font-family-mono",
 });
@@ -33,9 +33,11 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`${plexSans.variable} ${plexMono.variable} antialiased`}
+                className={`${plexSans.variable} ${plexMono.variable}`}
             >
+            <div className="font-sans!">
                 <Providers>{children}</Providers>
+            </div>
             </body>
         </html>
     );

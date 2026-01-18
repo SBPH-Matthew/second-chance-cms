@@ -81,6 +81,7 @@ export const createProduct = async (
     formData.append("name", payload.name);
     formData.append("description", payload.description);
     formData.append("price", payload.price.toString());
+    formData.append("location", payload.location);
     formData.append("category", payload.category);
     formData.append("condition", payload.condition);
     formData.append("status", payload.status);
@@ -137,12 +138,16 @@ export const updateProduct = async ({
     formData.append("name", payload.name);
     formData.append("description", payload.description);
     formData.append("price", payload.price.toString());
+    formData.append("location", payload.location);
     formData.append("category", payload.category);
     formData.append("condition", payload.condition);
     formData.append("status", payload.status);
 
     // Always append existingImages (even if empty array) to indicate image management
-    formData.append("existingImages", JSON.stringify(payload.existingImages || []));
+    formData.append(
+      "existingImages",
+      JSON.stringify(payload.existingImages || []),
+    );
 
     // Append all new image files
     if (hasImages) {

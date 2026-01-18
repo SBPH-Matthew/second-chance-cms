@@ -1,7 +1,8 @@
 "use client";
 
-import { Button, Column, Grid, Tile } from "@carbon/react";
+import { Button, ClickableTile, Column, Grid, Tile } from "@carbon/react";
 import {
+  ArrowRight,
   Category,
   GroupAccess,
   Product,
@@ -68,28 +69,17 @@ export const Dashboard = () => {
           const Icon = stat.icon;
           return (
             <Column key={stat.title} lg={4} md={4} sm={4}>
-              <Tile className="h-full">
+              <ClickableTile className="h-40 " renderIcon={ArrowRight}>
                 <div className="flex items-start justify-between mb-4!">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 mb-1!">
-                      {stat.title}
-                    </h3>
+                    <h3 className="text-sm font-medium  mb-1!">{stat.title}</h3>
                     <p className="text-3xl font-semibold">{stat.value}</p>
                   </div>
-                  <div className="text-blue-500">
+                  <div className="">
                     <Icon size={32} />
                   </div>
                 </div>
-                <Button
-                  kind="ghost"
-                  size="sm"
-                  as={Link}
-                  href={stat.href}
-                  className="mt-2"
-                >
-                  View all →
-                </Button>
-              </Tile>
+              </ClickableTile>
             </Column>
           );
         })}
@@ -97,50 +87,18 @@ export const Dashboard = () => {
 
       <div className="mt-8!">
         <h2 className="text-xl font-semibold mb-4!">Quick Actions</h2>
-        <Grid fullWidth>
-          <Column lg={3} md={4} sm={4}>
-            <Tile>
-              <h3 className="text-lg font-semibold mb-2!">Categories</h3>
-              <p className="text-sm text-gray-500 mb-4!">
-                Manage your product categories
-              </p>
-              <Button as={Link} href="/category" kind="primary">
-                Manage Categories
-              </Button>
-            </Tile>
-          </Column>
-          <Column lg={3} md={4} sm={4}>
-            <Tile>
-              <h3 className="text-lg font-semibold mb-2">Products</h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Add and manage products
-              </p>
-              <Button as={Link} href="/product" kind="primary">
-                Manage Products
-              </Button>
-            </Tile>
-          </Column>
-          <Column lg={3} md={4} sm={4}>
-            <Tile>
-              <h3 className="text-lg font-semibold mb-2">Vehicles</h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Manage vehicle inventory
-              </p>
-              <Button as={Link} href="/vehicle" kind="primary">
-                Manage Vehicles
-              </Button>
-            </Tile>
-          </Column>
-          <Column lg={3} md={4} sm={4}>
-            <Tile>
-              <h3 className="text-lg font-semibold mb-2">Users</h3>
-              <p className="text-sm text-gray-500 mb-4">Manage user accounts</p>
-              <Button as={Link} href="/user" kind="primary">
-                Manage Users
-              </Button>
-            </Tile>
-          </Column>
-        </Grid>
+
+        <div className="grid grid-cols-6 gap-0.5">
+          <ClickableTile className="col-span-4 row-span-4 h-96">
+            <h3 className="text-sm">Users</h3>
+          </ClickableTile>
+          <ClickableTile className="col-span-2 row-span-2">
+            <h3 className="text-sm">Categories</h3>
+          </ClickableTile>
+          <ClickableTile className="col-span-2 row-span-2">
+            <h3 className="text-sm">Vehicles</h3>
+          </ClickableTile>
+        </div>
       </div>
     </div>
   );

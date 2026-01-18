@@ -18,7 +18,7 @@ import {
   TableToolbarSearch,
 } from "@carbon/react";
 import { useState } from "react";
-import { ProductConditionResponse } from "@/app/types/product";
+import { ProductCondition as ProductConditionType } from "@/app/types/product";
 import { useGetProductConditions } from "./hooks";
 import { ProductConditionModal } from "./components/ProductConditionModal";
 import { DeleteProductConditionModal } from "./components/DeleteProductConditionModal";
@@ -27,14 +27,14 @@ export const ProductCondition = () => {
   const [open, setOpen] = useState(false);
   const [dangerModalOpen, setDangerModalOpen] = useState(false);
   const [selectedProductCondition, setSelectedProductCondition] =
-    useState<ProductConditionResponse | null>(null);
+    useState<ProductConditionType | null>(null);
 
   const { data: productConditionsData, isPending: loadingProductConditions } =
     useGetProductConditions();
 
   const isEmpty = productConditionsData?.product_conditions.length === 0;
 
-  const handleOpenEdit = (productCondition: ProductConditionResponse) => {
+  const handleOpenEdit = (productCondition: ProductConditionType) => {
     setSelectedProductCondition(productCondition);
     setOpen(true);
   };
@@ -49,7 +49,7 @@ export const ProductCondition = () => {
     setSelectedProductCondition(null);
   };
 
-  const handleOpenDelete = (productCondition: ProductConditionResponse) => {
+  const handleOpenDelete = (productCondition: ProductConditionType) => {
     setSelectedProductCondition(productCondition);
     setDangerModalOpen(true);
   };

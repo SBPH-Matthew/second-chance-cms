@@ -1,7 +1,7 @@
 import {
   GetNotificationsResponse,
-  ResponseType,
 } from "@/app/types/notification";
+import { ResponseType } from "@/app/types/ResponseType";
 
 export const getNotifications = async (
   signal?: AbortSignal,

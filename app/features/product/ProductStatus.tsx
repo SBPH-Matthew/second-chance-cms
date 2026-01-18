@@ -18,7 +18,7 @@ import {
   TableToolbarSearch,
 } from "@carbon/react";
 import { useState } from "react";
-import { ProductStatusResponse } from "@/app/types/product";
+import { ProductStatus as ProductStatusType } from "@/app/types/product";
 import { useGetProductStatuses } from "./hooks";
 import { ProductStatusModal } from "./components/ProductStatusModal";
 import { DeleteProductStatusModal } from "./components/DeleteProductStatusModal";
@@ -27,14 +27,14 @@ export const ProductStatus = () => {
   const [open, setOpen] = useState(false);
   const [dangerModalOpen, setDangerModalOpen] = useState(false);
   const [selectedProductStatus, setSelectedProductStatus] =
-    useState<ProductStatusResponse | null>(null);
+    useState<ProductStatusType | null>(null);
 
   const { data: productStatusesData, isPending: loadingProductStatuses } =
     useGetProductStatuses();
 
   const isEmpty = productStatusesData?.product_status.length === 0;
 
-  const handleOpenEdit = (productStatus: ProductStatusResponse) => {
+  const handleOpenEdit = (productStatus: ProductStatusType) => {
     setSelectedProductStatus(productStatus);
     setOpen(true);
   };
@@ -49,7 +49,7 @@ export const ProductStatus = () => {
     setSelectedProductStatus(null);
   };
 
-  const handleOpenDelete = (productStatus: ProductStatusResponse) => {
+  const handleOpenDelete = (productStatus: ProductStatusType) => {
     setSelectedProductStatus(productStatus);
     setDangerModalOpen(true);
   };

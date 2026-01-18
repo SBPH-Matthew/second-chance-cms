@@ -9,7 +9,7 @@ import {
 } from "../hooks";
 import { useModalLoading } from "@/app/hooks";
 import { useQueryClient } from "@tanstack/react-query";
-import { ProductConditionResponse } from "@/app/types/product";
+import { ProductCondition } from "@/app/types/product";
 import { ValidationResponse } from "@/app/types";
 
 const CreateProductConditionSchema = z.object({
@@ -21,7 +21,7 @@ type CreateProductConditionRequest = z.infer<typeof CreateProductConditionSchema
 interface ProductConditionModalProps {
   open: boolean;
   onClose: () => void;
-  productCondition: ProductConditionResponse | null;
+  productCondition: ProductCondition | null;
 }
 
 export const ProductConditionModal = ({

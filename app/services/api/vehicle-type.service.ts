@@ -1,4 +1,5 @@
-import { VehicleTypeResponse, ValidationResponse } from "@/app/types/vehicle";
+import { VehicleTypeResponse } from "@/app/types/vehicle";
+import { ValidationResponse } from "@/app/types/ResponseType";
 
 export const getVehicleTypes = async (
   signal?: AbortSignal

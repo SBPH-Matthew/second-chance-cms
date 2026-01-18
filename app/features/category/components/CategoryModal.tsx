@@ -82,8 +82,8 @@ export const CategoryModal = ({
             if (category) {
                 reset({
                     name: category.name,
-                    category_group: category.category_group.toString(),
-                    status: category.status.toString(),
+                    category_group: category.category_group?.id.toString() || "",
+                    status: category.status?.id.toString() || "",
                 });
             } else {
                 reset({
