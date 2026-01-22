@@ -106,6 +106,11 @@ export const DashboardLayout = ({
     setSignOutModalOpen(true);
   };
 
+  const handleProfileNavigate = () => {
+    setUserMenuOpen(false);
+    router.push("/dashboard/profile");
+  };
+
   const handleSignOutConfirm = async () => {
     try {
       await logoutUser();
@@ -441,7 +446,11 @@ export const DashboardLayout = ({
                       </div>
 
                       {/* Menu Items */}
-                      <Button className="w-full!" kind="ghost">
+                      <Button
+                        className="w-full!"
+                        kind="ghost"
+                        onClick={handleProfileNavigate}
+                      >
                         Profile
                       </Button>
                       <Button className="w-full!" kind="ghost">

@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "@carbon/icons-react": "^11.71.0",
+        "@carbon/pictograms-react": "^11.93.0",
         "@carbon/react": "^1.97.0",
         "@carbon/styles": "^1.96.0",
         "@carbon/type": "^11.50.0",
