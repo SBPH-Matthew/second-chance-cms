@@ -1,5 +1,5 @@
 "use client";
-import { Add, OverflowMenuHorizontal } from "@carbon/icons-react";
+import { Add, OverflowMenuHorizontal, User } from "@carbon/icons-react";
 import {
   Button,
   DataTableSkeleton,
@@ -213,21 +213,23 @@ export const Users = () => {
                             alt={`${user.first_name} ${user.last_name}`}
                             className="w-10 h-10 rounded-full object-cover border"
                             onError={(e) => {
-                              // Fallback to initials if image fails to load
+                              // Fallback to User icon if image fails to load
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';
                               const parent = target.parentElement;
-                              if (parent && !parent.querySelector('.avatar-initials')) {
-                                const initialsDiv = document.createElement('div');
-                                initialsDiv.className = 'avatar-initials w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold';
-                                initialsDiv.textContent = getInitials(user.first_name, user.last_name);
-                                parent.appendChild(initialsDiv);
+                              if (parent && !parent.querySelector('.avatar-fallback')) {
+                                const fallbackDiv = document.createElement('div');
+                                fallbackDiv.className = 'avatar-fallback w-10 h-10 rounded-full bg-[#393939] flex items-center justify-center p-2';
+                                const userIcon = document.createElement('div');
+                                userIcon.innerHTML = '<svg width="20" height="20" viewBox="0 0 32 32" fill="currentColor"><path d="M16 8a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3z"/><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26a12 12 0 0 1-10.29-5.79l5.71-5.71a2 2 0 0 1 2.83 0l5.71 5.71A12 12 0 0 1 16 28zm0-24a12 12 0 0 1 10.29 18.79l-5.71-5.71a2 2 0 0 0-2.83 0l-5.71 5.71A12 12 0 0 1 16 4z"/></svg>';
+                                fallbackDiv.appendChild(userIcon);
+                                parent.appendChild(fallbackDiv);
                               }
                             }}
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold">
-                            {getInitials(user.first_name, user.last_name)}
+                          <div className="w-10 h-10 rounded-full bg-[#393939] flex items-center justify-center p-2">
+                            <User size={20} />
                           </div>
                         )}
                       </TableCell>
