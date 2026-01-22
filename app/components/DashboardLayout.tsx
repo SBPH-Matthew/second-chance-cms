@@ -157,8 +157,8 @@ export const DashboardLayout = ({
                 isActive={isSideNavExpanded}
                 aria-expanded={isSideNavExpanded}
               />
-              <HeaderName href="/dashboard" prefix="">
-                Second Chance CMS
+              <HeaderName href="/dashboard" prefix="CMS">
+                Second Chance
               </HeaderName>
               <SideNav
                 aria-label="Side navigation"
