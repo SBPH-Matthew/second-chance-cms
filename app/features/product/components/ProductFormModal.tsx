@@ -9,7 +9,6 @@ import {
   TextArea,
   TextInput,
   FileUploader,
-  FileUploaderItem,
   Button,
 } from "@carbon/react";
 import { useEffect, useState } from "react";
@@ -21,7 +20,6 @@ import {
   ProductCondition,
   ProductStatus,
 } from "@/app/types/product";
-import { Category } from "@/app/types/category";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 

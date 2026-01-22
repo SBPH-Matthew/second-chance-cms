@@ -1,17 +1,15 @@
 "use client";
-import { CarbonLink, ContentLayout, SignOutModal } from "@/app/components";
+import {  ContentLayout, SignOutModal } from "@/app/components";
 import {
   Category as CaCategory,
   Dashboard as DashboardIcon,
   GroupAccess,
   Notification,
   Product,
-  Switcher,
   UserAvatar,
   VehicleApi,
   User,
-  Settings,
-  Logout,
+
   ArrowRight,
 } from "@carbon/icons-react";
 import {
@@ -40,6 +38,7 @@ import {
   useMarkAllNotificationsAsRead,
   useMarkNotificationAsRead,
 } from "@/app/features/notification";
+import { useLogout } from "@/app/features/auth";
 import { Notification as NotificationType } from "@/app/types/notification";
 
 export const DashboardLayout = ({
@@ -60,6 +59,7 @@ export const DashboardLayout = ({
     useGetNotifications();
   const { mutateAsync: markNotificationAsRead } = useMarkNotificationAsRead();
   const { mutateAsync: markAllAsRead } = useMarkAllNotificationsAsRead();
+  const { mutateAsync: logoutUser } = useLogout();
 
   const notifications = notificationsData?.notifications || [];
   const unreadCount = notificationsData?.unread_count || 0;
@@ -108,14 +108,9 @@ export const DashboardLayout = ({
 
   const handleSignOutConfirm = async () => {
     try {
-      // Call logout endpoint if it exists
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
+      await logoutUser();
 
-      // Even if logout endpoint fails, clear local state and redirect
-      // Clear any local storage or cookies if needed
+      // Clear local state and redirect
       setSignOutModalOpen(false);
       setUserMenuOpen(false);
 
@@ -162,7 +157,7 @@ export const DashboardLayout = ({
                 isActive={isSideNavExpanded}
                 aria-expanded={isSideNavExpanded}
               />
-              <HeaderName href="/dashboard/app" prefix="">
+              <HeaderName href="/dashboard" prefix="">
                 Second Chance CMS
               </HeaderName>
               <SideNav
@@ -175,7 +170,7 @@ export const DashboardLayout = ({
                   <SideNavLink
                     as={Link}
                     href="/dashboard"
-                    isActive={pathname === "/dashboard/app"}
+                    isActive={pathname === "/dashboard"}
                     renderIcon={DashboardIcon}
                     large
                   >
@@ -206,7 +201,7 @@ export const DashboardLayout = ({
                   </SideNavMenu>
                   <SideNavMenu
                     renderIcon={GroupAccess}
-                    title="Access (IAM)"
+                    title="User Management"
                     large
                   >
                     <SideNavMenuItem
@@ -321,57 +316,61 @@ export const DashboardLayout = ({
 
                       {/* Notification List */}
                       <div className="max-h-96! overflow-y-auto!">
-                        {isLoadingNotifications ? (
+                        {isLoadingNotifications && (
                           <div className="p-8! text-center! text-gray-500!">
                             <p className="m-0!">Loading notifications...</p>
                           </div>
-                        ) : notifications.length === 0 ? (
+                        )}
+                        {!isLoadingNotifications && notifications.length === 0 && (
                           <div className="p-8! text-center! text-gray-500!">
                             <p className="m-0!">No notifications</p>
                           </div>
-                        ) : (
+                        )}
+                        {!isLoadingNotifications && notifications.length > 0 && (
                           <ul className="divide-y! divide-gray-200! dark:divide-gray-700! m-0! p-0! list-none!">
                             {notifications.map(
-                              (notification: NotificationType) => (
-                                <li
-                                  key={notification.id}
-                                  className={`p-4! hover:bg-gray-50! dark:hover:bg-gray-800! cursor-pointer! transition-colors! ${
-                                    !notification.is_read
-                                      ? "bg-blue-50! dark:bg-blue-900/20!"
-                                      : ""
-                                  }`}
-                                  onClick={() =>
-                                    handleMarkAsRead(notification.id)
-                                  }
-                                >
-                                  <div className="flex! items-start! justify-between!">
-                                    <div className="flex-1!">
-                                      <div className="flex! items-center! gap-2! mb-1!">
-                                        <h4
-                                          className={`font-semibold! text-sm! m-0! ${
-                                            !notification.is_read
-                                              ? "text-gray-900! dark:text-gray-100!"
-                                              : "text-gray-600! dark:text-gray-400!"
-                                          }`}
-                                        >
-                                          {notification.title}
-                                        </h4>
-                                        {!notification.is_read && (
-                                          <span className="w-2! h-2! bg-blue-500! rounded-full! shrink-0!"></span>
-                                        )}
+                              (notification: NotificationType) => {
+                                const isRead = notification.is_read;
+                                const notificationBgClass = isRead
+                                  ? ""
+                                  : "bg-blue-50! dark:bg-blue-900/20!";
+                                const titleColorClass = isRead
+                                  ? "text-gray-600! dark:text-gray-400!"
+                                  : "text-gray-900! dark:text-gray-100!";
+                                return (
+                                  <button
+                                    key={notification.id}
+                                    className={`p-4! hover:bg-gray-50! dark:hover:bg-gray-800! cursor-pointer! transition-colors! w-full! text-left! border-none! bg-transparent! ${notificationBgClass}`}
+                                    onClick={() =>
+                                      handleMarkAsRead(notification.id)
+                                    }
+                                    aria-label={`Mark notification "${notification.title}" as read`}
+                                  >
+                                    <div className="flex! items-start! justify-between!">
+                                      <div className="flex-1!">
+                                        <div className="flex! items-center! gap-2! mb-1!">
+                                          <h4
+                                            className={`font-semibold! text-sm! m-0! ${titleColorClass}`}
+                                          >
+                                            {notification.title}
+                                          </h4>
+                                          {!isRead && (
+                                            <span className="w-2! h-2! bg-blue-500! rounded-full! shrink-0!"></span>
+                                          )}
+                                        </div>
+                                        <p className="text-sm! text-gray-600! dark:text-gray-400! mb-1! m-0!">
+                                          {notification.message}
+                                        </p>
+                                        <p className="text-xs! text-gray-400! dark:text-gray-500! m-0!">
+                                          {formatTimestamp(
+                                            notification.created_at,
+                                          )}
+                                        </p>
                                       </div>
-                                      <p className="text-sm! text-gray-600! dark:text-gray-400! mb-1! m-0!">
-                                        {notification.message}
-                                      </p>
-                                      <p className="text-xs! text-gray-400! dark:text-gray-500! m-0!">
-                                        {formatTimestamp(
-                                          notification.created_at,
-                                        )}
-                                      </p>
                                     </div>
-                                  </div>
-                                </li>
-                              ),
+                                  </button>
+                                );
+                              },
                             )}
                           </ul>
                         )}

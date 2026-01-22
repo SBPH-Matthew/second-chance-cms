@@ -18,8 +18,10 @@ import {
   OverflowMenu,
   OverflowMenuItem,
   TableToolbarSearch,
+  Popover,
+  PopoverContent,
 } from "@carbon/react";
-import { Add } from "@carbon/icons-react";
+import { Add, Information } from "@carbon/icons-react";
 import { useState, useRef, useEffect } from "react";
 import {
   CreateVehicleRequest,
@@ -27,6 +29,7 @@ import {
 } from "@/app/types/vehicle";
 import { VehicleFormModal } from "./components/VehicleFormModal";
 import { DeleteVehicleModal } from "./components/DeleteVehicleModal";
+import { BoostModal } from "./components/BoostModal";
 import {
   useCreateVehicle,
   useGetVehicleTypes,
@@ -42,8 +45,126 @@ const TABLE_HEADERS = [
   { key: "price", header: "Price" },
   { key: "vehicleType", header: "Vehicle Type" },
   { key: "location", header: "Location" },
+  { key: "boost", header: "Boost" },
   { key: "actions", header: "" },
 ];
+
+// Component for Boost Info Popover
+const BoostInfoPopover = ({ boost }: { boost: any }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleOpen = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 100);
+  };
+
+  const handleClick = () => {
+    setIsOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  if (!boost.start_date || !boost.end_date) return null;
+
+  const startDate = new Date(boost.start_date);
+  const endDate = new Date(boost.end_date);
+  const now = new Date();
+
+  // Calculate elapsed time
+  const elapsedMs = now.getTime() - startDate.getTime();
+  const elapsedHours = Math.floor(elapsedMs / (1000 * 60 * 60));
+  const elapsedMinutes = Math.floor((elapsedMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  // Calculate remaining time
+  const remainingMs = endDate.getTime() - now.getTime();
+
+  const isExpired = remainingMs <= 0;
+  const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+  const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+  const remainingDays = Math.floor(remainingHours / 24);
+
+  const elapsedText = elapsedHours > 0 
+    ? `${elapsedHours}h ${elapsedMinutes}m elapsed`
+    : `${elapsedMinutes}m elapsed`;
+
+  const remainingText = remainingDays > 0
+    ? `${remainingDays} day${remainingDays > 1 ? 's' : ''}, ${remainingHours % 24}h ${remainingMinutes}m`
+    : remainingHours > 0
+      ? `${remainingHours}h ${remainingMinutes}m`
+      : `${remainingMinutes}m`;
+
+  return (
+    <Popover
+      align="left"
+      autoAlign
+      dropShadow
+      caret={false}
+      open={isOpen}
+      onRequestClose={() => setIsOpen(false)}
+    >
+      <button
+        type="button"
+        className="flex items-center justify-center w-4 h-4 text-icon-secondary hover:text-icon-primary transition-colors"
+        aria-label="Boost information"
+        onMouseEnter={handleOpen}
+        onMouseLeave={handleClose}
+        onClick={handleClick}
+      >
+        <Information size={14} />
+      </button>
+      <PopoverContent 
+        className="p-3!"
+        onMouseEnter={handleOpen}
+        onMouseLeave={handleClose}
+      >
+        <div className="flex flex-col gap-2 min-w-[200px]">
+          <div className="font-semibold text-sm">
+            Boost Details
+          </div>
+          <div className="text-xs text-text-secondary space-y-1">
+            {isExpired ? (
+              <>
+                <div>Status: <span className="font-medium text-red-600">Expired</span></div>
+                <div>Ended: {endDate.toLocaleString()}</div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <span className="font-medium">Elapsed:</span> {elapsedText}
+                </div>
+                <div>
+                  <span className="font-medium">Remaining:</span> {remainingText}
+                </div>
+                <div>
+                  <span className="font-medium">Started:</span> {startDate.toLocaleString()}
+                </div>
+                <div>
+                  <span className="font-medium">Ends:</span> {endDate.toLocaleString()}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 export const Vehicle = () => {
   const queryClient = useQueryClient();
@@ -53,6 +174,7 @@ export const Vehicle = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isBoostOpen, setIsBoostOpen] = useState(false);
   const [currentVehicle, setCurrentVehicle] = useState<VehicleType | null>(
     null
   );
@@ -159,6 +281,11 @@ export const Vehicle = () => {
     setIsDeleteOpen(true);
   };
 
+  const openBoost = (vehicle: VehicleType) => {
+    setCurrentVehicle(vehicle);
+    setIsBoostOpen(true);
+  };
+
   // Prepare data for Table
   // Map the API response to match our expected format (snake_case from backend)
   const rows = (vehiclesData?.vehicles.items || []).map((item: VehicleType) => {
@@ -185,6 +312,8 @@ export const Vehicle = () => {
           }
         : undefined,
       seller: item.seller,
+      active_boost: item.active_boost,
+      is_boosted: item.is_boosted,
       // Store original vehicle object for edit/delete operations
       originalVehicle: item,
     };
@@ -368,7 +497,39 @@ export const Vehicle = () => {
                           </TableCell>
                           <TableCell>{rowData.location || "N/A"}</TableCell>
                           <TableCell>
+                            {rowData.is_boosted && rowData.active_boost ? (
+                              <div className="flex items-center gap-1.5">
+                                <Tag
+                                  type={
+                                    rowData.active_boost.boost_type === "top"
+                                      ? "red"
+                                      : rowData.active_boost.boost_type === "featured"
+                                        ? "purple"
+                                        : "cyan"
+                                  }
+                                  className="w-fit"
+                                >
+                                  {rowData.active_boost.boost_type.toUpperCase()}
+                                </Tag>
+                                <BoostInfoPopover boost={rowData.active_boost} />
+                              </div>
+                            ) : (
+                              <Tag type="gray" className="w-fit">
+                                NO BOOST
+                              </Tag>
+                            )}
+                          </TableCell>
+                          <TableCell>
                             <OverflowMenu flipped>
+                              <OverflowMenuItem
+                                itemText="Boost"
+                                onClick={() => {
+                                  const originalVehicle = (rowData as any)
+                                    .originalVehicle as VehicleType;
+                                  if (originalVehicle)
+                                    openBoost(originalVehicle);
+                                }}
+                              />
                               <OverflowMenuItem
                                 itemText="Edit"
                                 onClick={() => {
@@ -446,6 +607,22 @@ export const Vehicle = () => {
           currentVehicle?.vehicle_model || ""
         }`}
       />
+
+      {currentVehicle && (
+        <BoostModal
+          open={isBoostOpen}
+          onClose={() => {
+            setIsBoostOpen(false);
+            setCurrentVehicle(null);
+          }}
+          itemType="vehicle"
+          itemId={currentVehicle.id}
+          itemName={`${currentVehicle.vehicle_make || ""} ${
+            currentVehicle.vehicle_model || ""
+          }`}
+          existingBoost={currentVehicle.active_boost || null}
+        />
+      )}
     </div>
   );
 };

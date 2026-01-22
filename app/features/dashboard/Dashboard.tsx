@@ -8,7 +8,6 @@ import {
   Product,
   VehicleApi,
 } from "@carbon/icons-react";
-import Link from "next/link";
 import { useGetPaginateUser } from "../iam/hooks/useIam";
 import { usePaginateCategories } from "../category/hooks";
 import { usePaginateProducts } from "../product/hooks";

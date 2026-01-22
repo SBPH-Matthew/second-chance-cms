@@ -1,4 +1,4 @@
-import { login, register } from "@/app/services";
+import { login, register, logout } from "@/app/services";
 import {
   LoginErrorType,
   LoginRequestType,
@@ -22,5 +22,11 @@ export const useRegister = () => {
 export const useLogin = () => {
   return useMutation<LoginResponseType, LoginErrorType, LoginRequestType>({
     mutationFn: login,
+  });
+};
+
+export const useLogout = () => {
+  return useMutation<void, Error, void>({
+    mutationFn: logout,
   });
 };

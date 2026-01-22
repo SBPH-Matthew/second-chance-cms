@@ -18,6 +18,12 @@ export const createUserSchema = z
             .min(8)
             .max(255),
         role: z.string({ message: "Role is required" }),
+        profile_picture: z.instanceof(File).optional(),
+        country: z.string().optional(),
+        state_province: z.string().optional(),
+        street_address_1: z.string().optional(),
+        street_address_2: z.string().optional(),
+        zip_postal_code: z.string().optional(),
     })
     .refine((data) => data.password === data.confirm_password, {
         message: "Passwords do not match.",
@@ -31,6 +37,13 @@ export const updateUserSchema = z.object({
     first_name: z.string({ message: "First name is required" }).min(2).max(255),
     last_name: z.string({ message: "Last name is required" }).min(2).max(255),
     role: z.string({ message: "Role is required" }),
+    profile_picture: z.instanceof(File).optional(),
+    existing_profile_picture: z.string().optional(),
+    country: z.string().optional(),
+    state_province: z.string().optional(),
+    street_address_1: z.string().optional(),
+    street_address_2: z.string().optional(),
+    zip_postal_code: z.string().optional(),
 });
 
 export type UpdateUserSchema = z.infer<typeof updateUserSchema>;

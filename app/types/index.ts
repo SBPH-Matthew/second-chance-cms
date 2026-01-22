@@ -7,3 +7,4 @@ export * from "./roles";
 export * from "./product";
 export * from "./shared";
 export * from "./notification";
+export * from "./boost";

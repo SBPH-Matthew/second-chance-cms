@@ -34,7 +34,7 @@ export const Login = () => {
     loginPOST(data, {
       onSuccess: (data) => {
         console.log("success", data);
-        router.push("/dashboard/app");
+        router.push("/dashboard/");
       },
       onError: (error) => {
         // Set field-specific errors

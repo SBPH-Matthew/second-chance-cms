@@ -39,13 +39,39 @@ export const paginateUser = async ({
 };
 
 export const createUser = async (payload: CreateUserSchema): Promise<ResponseType> => {
+  // Always use FormData since backend expects multipart/form-data
+  const formData = new FormData();
+  formData.append("first_name", payload.first_name);
+  formData.append("last_name", payload.last_name);
+  formData.append("email", payload.email);
+  formData.append("password", payload.password);
+  formData.append("confirm_password", payload.confirm_password);
+  formData.append("role", payload.role);
+  
+  if (payload.profile_picture) {
+    formData.append("profile_picture", payload.profile_picture);
+  }
+  if (payload.country) {
+    formData.append("country", payload.country);
+  }
+  if (payload.state_province) {
+    formData.append("state_province", payload.state_province);
+  }
+  if (payload.street_address_1) {
+    formData.append("street_address_1", payload.street_address_1);
+  }
+  if (payload.street_address_2) {
+    formData.append("street_address_2", payload.street_address_2);
+  }
+  if (payload.zip_postal_code) {
+    formData.append("zip_postal_code", payload.zip_postal_code);
+  }
+
   const response = await fetch(`${process.env.NEXT_PUBLIC_API}/user/`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    // Don't set Content-Type header, let browser set it with boundary
     credentials: "include",
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
   const data = await response.json();
@@ -64,13 +90,40 @@ export const updateUser = async ({
   id: number;
   payload: UpdateUserSchema;
 }): Promise<ResponseType> => {
+  // Always use FormData since backend expects multipart/form-data
+  const formData = new FormData();
+  formData.append("first_name", payload.first_name);
+  formData.append("last_name", payload.last_name);
+  formData.append("email", payload.email);
+  formData.append("role", payload.role);
+  
+  if (payload.profile_picture) {
+    formData.append("profile_picture", payload.profile_picture);
+  }
+  if (payload.existing_profile_picture) {
+    formData.append("existing_profile_picture", payload.existing_profile_picture);
+  }
+  if (payload.country) {
+    formData.append("country", payload.country);
+  }
+  if (payload.state_province) {
+    formData.append("state_province", payload.state_province);
+  }
+  if (payload.street_address_1) {
+    formData.append("street_address_1", payload.street_address_1);
+  }
+  if (payload.street_address_2) {
+    formData.append("street_address_2", payload.street_address_2);
+  }
+  if (payload.zip_postal_code) {
+    formData.append("zip_postal_code", payload.zip_postal_code);
+  }
+
   const response = await fetch(`${process.env.NEXT_PUBLIC_API}/user/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    // Don't set Content-Type header, let browser set it with boundary
     credentials: "include",
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
   const data = await response.json();

@@ -51,3 +51,14 @@ export const login = async (
   }
   return data;
 };
+
+export const logout = async (): Promise<void> => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API}/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Logout failed");
+  }
+};

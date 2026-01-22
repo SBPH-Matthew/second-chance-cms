@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ResponseType } from "../ResponseType";
 import { User } from "../shared";
+import { Boost } from "../boost";
 
 // Backend model types (snake_case from JSON tags)
 export interface Vehicle {
@@ -16,6 +17,8 @@ export interface Vehicle {
   seller_id: number;
   vehicle_type?: VehicleType;
   seller?: User;
+  active_boost?: Boost;
+  is_boosted?: boolean;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string | null;

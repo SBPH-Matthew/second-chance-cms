@@ -5,6 +5,12 @@ export interface User {
   last_name: string;
   email: string;
   role_id: number;
+  profile_picture?: string;
+  country?: string;
+  state_province?: string;
+  street_address_1?: string;
+  street_address_2?: string;
+  zip_postal_code?: string;
   role?: Role;
   created_at?: string;
   updated_at?: string;

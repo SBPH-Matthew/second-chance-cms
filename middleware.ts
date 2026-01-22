@@ -39,7 +39,7 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isAuthPage && isAuthenticated) {
-    return NextResponse.redirect(new URL('/dashboard/app', request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return NextResponse.next()

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { ResponseType } from "../ResponseType";
 import { Category } from "../category";
 import { User } from "../shared";
+import { Boost } from "../boost";
 
 // Backend model types (snake_case from JSON tags)
 export interface Product {
@@ -19,6 +20,8 @@ export interface Product {
   status?: ProductStatus;
   seller?: User;
   product_condition?: ProductCondition;
+  active_boost?: Boost;
+  is_boosted?: boolean;
   created_at?: string;
   updated_at?: string;
   deleted_at?: string | null;

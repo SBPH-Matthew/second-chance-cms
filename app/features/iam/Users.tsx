@@ -108,6 +108,7 @@ export const Users = () => {
         <DataTableSkeleton
           aria-label="User tables"
           headers={[
+            { header: "Avatar", key: "avatar" },
             { header: "Name", key: "name" },
             { header: "Email", key: "email" },
             { header: "Role", key: "role" },
@@ -115,7 +116,7 @@ export const Users = () => {
           ]}
           showHeader
           showToolbar
-          columnCount={4}
+          columnCount={5}
         />
       ) : (
         <TableContainer
@@ -142,6 +143,7 @@ export const Users = () => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableHeader>Avatar</TableHeader>
                 <TableHeader>Name</TableHeader>
                 <TableHeader>Email</TableHeader>
                 <TableHeader>Role</TableHeader>
@@ -151,7 +153,7 @@ export const Users = () => {
             <TableBody>
               {isEmpty ? (
                 <TableRow>
-                  <TableCell colSpan={4}>
+                  <TableCell colSpan={5}>
                     <div className="flex flex-col items-start justify-center gap-4 ps-5! py-5!">
                       {isEmptyWithSearch ? (
                         <>
@@ -187,34 +189,75 @@ export const Users = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                paginateUser?.users.items.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      {user.first_name} {user.last_name}
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell className="capitalize">
-                      {user.role?.name || "N/A"}
-                    </TableCell>
-                    <TableCell>
-                      <OverflowMenu
-                        aria-label="actions"
-                        renderIcon={OverflowMenuHorizontal}
-                        flipped
-                      >
-                        <OverflowMenuItem
-                          onClick={() => handleOpenUpdate(user.id)}
-                          itemText="Edit"
-                        />
-                        <OverflowMenuItem
-                          itemText="Delete"
-                          onClick={() => handleOpenDelete(user.id)}
-                          isDelete
-                        />
-                      </OverflowMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
+                paginateUser?.users.items.map((user) => {
+                  const getImageUrl = (imagePath: string) => {
+                    if (imagePath.startsWith('http')) {
+                      return imagePath;
+                    }
+                    const apiUrl = process.env.NEXT_PUBLIC_API || '';
+                    return `${apiUrl}${imagePath}`;
+                  };
+
+                  const getInitials = (firstName: string, lastName: string) => {
+                    const first = firstName?.charAt(0)?.toUpperCase() || '';
+                    const last = lastName?.charAt(0)?.toUpperCase() || '';
+                    return `${first}${last}`;
+                  };
+
+                  return (
+                    <TableRow key={user.id}>
+                      <TableCell>
+                        {user.profile_picture ? (
+                          <img
+                            src={getImageUrl(user.profile_picture)}
+                            alt={`${user.first_name} ${user.last_name}`}
+                            className="w-10 h-10 rounded-full object-cover border"
+                            onError={(e) => {
+                              // Fallback to initials if image fails to load
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent && !parent.querySelector('.avatar-initials')) {
+                                const initialsDiv = document.createElement('div');
+                                initialsDiv.className = 'avatar-initials w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold';
+                                initialsDiv.textContent = getInitials(user.first_name, user.last_name);
+                                parent.appendChild(initialsDiv);
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold">
+                            {getInitials(user.first_name, user.last_name)}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {user.first_name} {user.last_name}
+                      </TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell className="capitalize">
+                        {user.role?.name || "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        <OverflowMenu
+                          aria-label="actions"
+                          renderIcon={OverflowMenuHorizontal}
+                          flipped
+                        >
+                          <OverflowMenuItem
+                            onClick={() => handleOpenUpdate(user.id)}
+                            itemText="Edit"
+                          />
+                          <OverflowMenuItem
+                            itemText="Delete"
+                            onClick={() => handleOpenDelete(user.id)}
+                            isDelete
+                          />
+                        </OverflowMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>

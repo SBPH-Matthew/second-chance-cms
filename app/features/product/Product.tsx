@@ -18,8 +18,10 @@ import {
   Tag,
   OverflowMenu,
   OverflowMenuItem,
+  Popover,
+  PopoverContent,
 } from "@carbon/react";
-import { Add } from "@carbon/icons-react";
+import { Add, Information } from "@carbon/icons-react";
 import { useState, useRef, useEffect } from "react";
 import {
   CreateProductRequest,
@@ -30,6 +32,7 @@ import {
 import { Category } from "@/app/types";
 import { ProductFormModal } from "./components/ProductFormModal";
 import { DeleteProductModal } from "./components/DeleteProductModal";
+import { BoostModal } from "./components/BoostModal";
 import {
   useCreateProduct,
   useDeleteProduct,
@@ -49,8 +52,126 @@ const TABLE_HEADERS = [
   { key: "category", header: "Category" },
   { key: "condition", header: "Condition" },
   { key: "status", header: "Status" },
+  { key: "boost", header: "Boost" },
   { key: "actions", header: "" },
 ];
+
+// Component for Boost Info Popover
+const BoostInfoPopover = ({ boost }: { boost: any }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleOpen = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 100);
+  };
+
+  const handleClick = () => {
+    setIsOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  if (!boost.start_date || !boost.end_date) return null;
+
+  const startDate = new Date(boost.start_date);
+  const endDate = new Date(boost.end_date);
+  const now = new Date();
+
+  // Calculate elapsed time
+  const elapsedMs = now.getTime() - startDate.getTime();
+  const elapsedHours = Math.floor(elapsedMs / (1000 * 60 * 60));
+  const elapsedMinutes = Math.floor((elapsedMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  // Calculate remaining time
+  const remainingMs = endDate.getTime() - now.getTime();
+
+  const isExpired = remainingMs <= 0;
+  const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+  const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+  const remainingDays = Math.floor(remainingHours / 24);
+
+  const elapsedText = elapsedHours > 0 
+    ? `${elapsedHours}h ${elapsedMinutes}m elapsed`
+    : `${elapsedMinutes}m elapsed`;
+
+  const remainingText = remainingDays > 0
+    ? `${remainingDays} day${remainingDays > 1 ? 's' : ''}, ${remainingHours % 24}h ${remainingMinutes}m`
+    : remainingHours > 0
+      ? `${remainingHours}h ${remainingMinutes}m`
+      : `${remainingMinutes}m`;
+
+  return (
+    <Popover
+      align="left"
+      autoAlign
+      dropShadow
+      caret={false}
+      open={isOpen}
+      onRequestClose={() => setIsOpen(false)}
+    >
+      <button
+        type="button"
+        className="flex items-center justify-center w-4 h-4 text-icon-secondary hover:text-icon-primary transition-colors"
+        aria-label="Boost information"
+        onMouseEnter={handleOpen}
+        onMouseLeave={handleClose}
+        onClick={handleClick}
+      >
+        <Information size={14} />
+      </button>
+      <PopoverContent 
+        className="p-3!"
+        onMouseEnter={handleOpen}
+        onMouseLeave={handleClose}
+      >
+        <div className="flex flex-col gap-2 min-w-[200px]">
+          <div className="font-semibold text-sm">
+            Boost Details
+          </div>
+          <div className="text-xs text-text-secondary space-y-1">
+            {isExpired ? (
+              <>
+                <div>Status: <span className="font-medium text-red-600">Expired</span></div>
+                <div>Ended: {endDate.toLocaleString()}</div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <span className="font-medium">Elapsed:</span> {elapsedText}
+                </div>
+                <div>
+                  <span className="font-medium">Remaining:</span> {remainingText}
+                </div>
+                <div>
+                  <span className="font-medium">Started:</span> {startDate.toLocaleString()}
+                </div>
+                <div>
+                  <span className="font-medium">Ends:</span> {endDate.toLocaleString()}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 export const Product = () => {
   const queryClient = useQueryClient();
@@ -60,6 +181,7 @@ export const Product = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isBoostOpen, setIsBoostOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<ProductType | null>(
     null,
   );
@@ -209,6 +331,11 @@ export const Product = () => {
     setIsDeleteOpen(true);
   };
 
+  const openBoost = (product: ProductType) => {
+    setCurrentProduct(product);
+    setIsBoostOpen(true);
+  };
+
   // Prepare data for Table
   const rows = productsData?.products.items || [];
   const totalItems = productsData?.products.total || 0;
@@ -267,7 +394,7 @@ export const Product = () => {
                 </Button>
               </TableToolbarContent>
             </TableToolbar>
-            <Table {...getTableProps()}>
+            <Table className="overflow-hidden" {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
@@ -359,7 +486,7 @@ export const Product = () => {
                         <TableCell>
                           <div className="flex gap-3">
                             {rowData.images && rowData.images.length > 0 && (
-                              <div className="flex-shrink-0">
+                              <div className="shrink-0">
                                 <img
                                   src={getImageUrl(rowData.images[0])}
                                   alt={rowData.name}
@@ -396,8 +523,35 @@ export const Product = () => {
                         <TableCell>
                           <Tag type={statusType}>{statusName}</Tag>
                         </TableCell>
+                        <TableCell>
+                          {rowData.is_boosted && rowData.active_boost ? (
+                            <div className="flex items-center gap-1.5">
+                              <Tag
+                                type={
+                                  rowData.active_boost.boost_type === "top"
+                                    ? "red"
+                                    : rowData.active_boost.boost_type === "featured"
+                                      ? "purple"
+                                      : "cyan"
+                                }
+                                className="w-fit"
+                              >
+                                {rowData.active_boost.boost_type.toUpperCase()}
+                              </Tag>
+                              <BoostInfoPopover boost={rowData.active_boost} />
+                            </div>
+                          ) : (
+                            <Tag type="gray" className="w-fit">
+                              NO BOOST
+                            </Tag>
+                          )}
+                        </TableCell>
                         <TableCell className="sticky right-0 bg-layer">
                           <OverflowMenu flipped>
+                            <OverflowMenuItem
+                              itemText="Boost"
+                              onClick={() => openBoost(rowData)}
+                            />
                             <OverflowMenuItem
                               itemText="Edit"
                               onClick={() => openEdit(rowData)}
@@ -470,6 +624,20 @@ export const Product = () => {
             setCurrentProduct(null);
             resetDelete();
           }}
+        />
+      )}
+
+      {currentProduct && (
+        <BoostModal
+          open={isBoostOpen}
+          onClose={() => {
+            setIsBoostOpen(false);
+            setCurrentProduct(null);
+          }}
+          itemType="product"
+          itemId={currentProduct.id}
+          itemName={currentProduct.name}
+          existingBoost={currentProduct.active_boost || null}
         />
       )}
     </div>
