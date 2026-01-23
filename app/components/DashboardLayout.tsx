@@ -1,5 +1,5 @@
 "use client";
-import {  ContentLayout, SignOutModal } from "@/app/components";
+import { ContentLayout, SignOutModal } from "@/app/components";
 import {
   Category as CaCategory,
   Dashboard as DashboardIcon,
@@ -9,7 +9,6 @@ import {
   UserAvatar,
   VehicleApi,
   User,
-
   ArrowRight,
 } from "@carbon/icons-react";
 import {
@@ -39,7 +38,9 @@ import {
   useMarkNotificationAsRead,
 } from "@/app/features/notification";
 import { useLogout } from "@/app/features/auth";
+import { useProfile } from "@/app/features/profile";
 import { Notification as NotificationType } from "@/app/types/notification";
+import { getImageUrl } from "@/app/utils/imageUrl";
 
 export const DashboardLayout = ({
   children,
@@ -60,6 +61,14 @@ export const DashboardLayout = ({
   const { mutateAsync: markNotificationAsRead } = useMarkNotificationAsRead();
   const { mutateAsync: markAllAsRead } = useMarkAllNotificationsAsRead();
   const { mutateAsync: logoutUser } = useLogout();
+  
+  // Fetch user profile for avatar
+  const { data: profileData } = useProfile();
+  const userProfile = profileData?.user;
+  const fullName = userProfile
+    ? `${userProfile.first_name || ""} ${userProfile.last_name || ""}`.trim() ||
+      userProfile.email
+    : "";
 
   const notifications = notificationsData?.notifications || [];
   const unreadCount = notificationsData?.unread_count || 0;
@@ -326,59 +335,61 @@ export const DashboardLayout = ({
                             <p className="m-0!">Loading notifications...</p>
                           </div>
                         )}
-                        {!isLoadingNotifications && notifications.length === 0 && (
-                          <div className="p-8! text-center! text-gray-500!">
-                            <p className="m-0!">No notifications</p>
-                          </div>
-                        )}
-                        {!isLoadingNotifications && notifications.length > 0 && (
-                          <ul className="divide-y! divide-gray-200! dark:divide-gray-700! m-0! p-0! list-none!">
-                            {notifications.map(
-                              (notification: NotificationType) => {
-                                const isRead = notification.is_read;
-                                const notificationBgClass = isRead
-                                  ? ""
-                                  : "bg-blue-50! dark:bg-blue-900/20!";
-                                const titleColorClass = isRead
-                                  ? "text-gray-600! dark:text-gray-400!"
-                                  : "text-gray-900! dark:text-gray-100!";
-                                return (
-                                  <button
-                                    key={notification.id}
-                                    className={`p-4! hover:bg-gray-50! dark:hover:bg-gray-800! cursor-pointer! transition-colors! w-full! text-left! border-none! bg-transparent! ${notificationBgClass}`}
-                                    onClick={() =>
-                                      handleMarkAsRead(notification.id)
-                                    }
-                                    aria-label={`Mark notification "${notification.title}" as read`}
-                                  >
-                                    <div className="flex! items-start! justify-between!">
-                                      <div className="flex-1!">
-                                        <div className="flex! items-center! gap-2! mb-1!">
-                                          <h4
-                                            className={`font-semibold! text-sm! m-0! ${titleColorClass}`}
-                                          >
-                                            {notification.title}
-                                          </h4>
-                                          {!isRead && (
-                                            <span className="w-2! h-2! bg-blue-500! rounded-full! shrink-0!"></span>
-                                          )}
+                        {!isLoadingNotifications &&
+                          notifications.length === 0 && (
+                            <div className="p-8! text-center! text-gray-500!">
+                              <p className="m-0!">No notifications</p>
+                            </div>
+                          )}
+                        {!isLoadingNotifications &&
+                          notifications.length > 0 && (
+                            <ul className="divide-y! divide-gray-200! dark:divide-gray-700! m-0! p-0! list-none!">
+                              {notifications.map(
+                                (notification: NotificationType) => {
+                                  const isRead = notification.is_read;
+                                  const notificationBgClass = isRead
+                                    ? ""
+                                    : "bg-blue-50! dark:bg-blue-900/20!";
+                                  const titleColorClass = isRead
+                                    ? "text-gray-600! dark:text-gray-400!"
+                                    : "text-gray-900! dark:text-gray-100!";
+                                  return (
+                                    <button
+                                      key={notification.id}
+                                      className={`p-4! hover:bg-gray-50! dark:hover:bg-gray-800! cursor-pointer! transition-colors! w-full! text-left! border-none! bg-transparent! ${notificationBgClass}`}
+                                      onClick={() =>
+                                        handleMarkAsRead(notification.id)
+                                      }
+                                      aria-label={`Mark notification "${notification.title}" as read`}
+                                    >
+                                      <div className="flex! items-start! justify-between!">
+                                        <div className="flex-1!">
+                                          <div className="flex! items-center! gap-2! mb-1!">
+                                            <h4
+                                              className={`font-semibold! text-sm! m-0! ${titleColorClass}`}
+                                            >
+                                              {notification.title}
+                                            </h4>
+                                            {!isRead && (
+                                              <span className="w-2! h-2! bg-blue-500! rounded-full! shrink-0!"></span>
+                                            )}
+                                          </div>
+                                          <p className="text-sm! text-gray-600! dark:text-gray-400! mb-1! m-0!">
+                                            {notification.message}
+                                          </p>
+                                          <p className="text-xs! text-gray-400! dark:text-gray-500! m-0!">
+                                            {formatTimestamp(
+                                              notification.created_at,
+                                            )}
+                                          </p>
                                         </div>
-                                        <p className="text-sm! text-gray-600! dark:text-gray-400! mb-1! m-0!">
-                                          {notification.message}
-                                        </p>
-                                        <p className="text-xs! text-gray-400! dark:text-gray-500! m-0!">
-                                          {formatTimestamp(
-                                            notification.created_at,
-                                          )}
-                                        </p>
                                       </div>
-                                    </div>
-                                  </button>
-                                );
-                              },
-                            )}
-                          </ul>
-                        )}
+                                    </button>
+                                  );
+                                },
+                              )}
+                            </ul>
+                          )}
                       </div>
 
                       {/* Footer */}
@@ -435,13 +446,43 @@ export const DashboardLayout = ({
                     >
                       {/* Header */}
                       <div className="flex items-center gap-3 px-4! pt-6! pb-4!">
-                        <div>
-                          <p className="text-xl!" style={{ fontWeight: 400 }}>
-                            Matthew Andre Butalid
+                        <div className="flex-1! min-w-0!">
+                          <p className="text-xl! truncate!" style={{ fontWeight: 400 }}>
+                            {fullName || userProfile?.email || "User"}
                           </p>
                         </div>
-                        <div className="rounded-full! p-4! bg-[#393939]!">
-                          <User size={28} />
+                        <div className="rounded-full! w-14! h-14! bg-[#393939]! shrink-0! overflow-hidden! flex! items-center! justify-center!">
+                          {userProfile?.profile_picture ? (
+                            <img
+                              src={getImageUrl(userProfile.profile_picture)}
+                              alt={fullName || "User"}
+                              className="w-full! h-full! object-cover! rounded-full!"
+                              onError={(e) => {
+                                // Fallback to User icon if image fails to load
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = "none";
+                                const parent = target.parentElement;
+                                if (parent && !parent.querySelector(".avatar-fallback")) {
+                                  const fallback = document.createElement("div");
+                                  fallback.className = "avatar-fallback flex! items-center! justify-center!";
+                                  const userIcon = document.createElementNS(
+                                    "http://www.w3.org/2000/svg",
+                                    "svg",
+                                  );
+                                  userIcon.setAttribute("width", "28");
+                                  userIcon.setAttribute("height", "28");
+                                  userIcon.setAttribute("viewBox", "0 0 32 32");
+                                  userIcon.setAttribute("fill", "currentColor");
+                                  userIcon.innerHTML =
+                                    '<path d="M16 8a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3z"/><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26a12 12 0 0 1-10.29-5.79l5.71-5.71a2 2 0 0 1 2.83 0l5.71 5.71A12 12 0 0 1 16 28zm0-24a12 12 0 0 1 10.29 18.79l-5.71-5.71a2 2 0 0 0-2.83 0l-5.71 5.71A12 12 0 0 1 16 4z"/>';
+                                  fallback.appendChild(userIcon);
+                                  parent.appendChild(fallback);
+                                }
+                              }}
+                            />
+                          ) : (
+                            <User size={28} />
+                          )}
                         </div>
                       </div>
 
