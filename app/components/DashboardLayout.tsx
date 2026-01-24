@@ -61,13 +61,13 @@ export const DashboardLayout = ({
   const { mutateAsync: markNotificationAsRead } = useMarkNotificationAsRead();
   const { mutateAsync: markAllAsRead } = useMarkAllNotificationsAsRead();
   const { mutateAsync: logoutUser } = useLogout();
-  
+
   // Fetch user profile for avatar
   const { data: profileData } = useProfile();
   const userProfile = profileData?.user;
   const fullName = userProfile
     ? `${userProfile.first_name || ""} ${userProfile.last_name || ""}`.trim() ||
-      userProfile.email
+    userProfile.email
     : "";
 
   const notifications = notificationsData?.notifications || [];
@@ -171,7 +171,7 @@ export const DashboardLayout = ({
                 isActive={isSideNavExpanded}
                 aria-expanded={isSideNavExpanded}
               />
-              <HeaderName href="/dashboard" prefix="CMS">
+              <HeaderName as={Link} href="/dashboard" prefix="CMS">
                 Second Chance
               </HeaderName>
               <SideNav
