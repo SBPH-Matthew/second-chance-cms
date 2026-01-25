@@ -9,3 +9,4 @@ export * from "./product-status.service";
 export * from "./vehicle.service";
 export * from "./notification.service";
 export * from "./boost.service";
+export * from "./message.service";

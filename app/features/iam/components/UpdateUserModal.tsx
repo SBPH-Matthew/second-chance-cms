@@ -82,7 +82,7 @@ export const UpdateUserModal = ({ open, onClose, user }: UpdateUserModalProps) =
         setValue: setValueUpdate,
         watch: watchUpdate,
     } = useForm<UpdateUserSchema>({
-        resolver: zodResolver(updateUserSchema),
+        resolver: zodResolver(updateUserSchema) as any,
         mode: "onSubmit",
     });
 
@@ -114,6 +114,8 @@ export const UpdateUserModal = ({ open, onClose, user }: UpdateUserModalProps) =
                 street_address_1: user.street_address_1 || "",
                 street_address_2: user.street_address_2 || "",
                 zip_postal_code: user.zip_postal_code || "",
+                rating: user.rating || 0,
+                total_reviews: user.total_reviews || 0,
                 existing_profile_picture: user.profile_picture || "",
             });
             setExistingProfilePicture(user.profile_picture || null);
@@ -200,8 +202,8 @@ export const UpdateUserModal = ({ open, onClose, user }: UpdateUserModalProps) =
 
     const submitUpdates =
         selectedTab === 0
-            ? submitUpdate(handleUpdatePayload)
-            : submitPass(handleChangePassword);
+            ? submitUpdate(handleUpdatePayload as any)
+            : submitPass(handleChangePassword as any);
 
     const getInitials = (firstName?: string, lastName?: string) => {
         const first = firstName?.charAt(0)?.toUpperCase() || '';
@@ -221,9 +223,9 @@ export const UpdateUserModal = ({ open, onClose, user }: UpdateUserModalProps) =
         return URL.createObjectURL(file);
     };
 
-    const displayProfilePicture = profilePicture 
+    const displayProfilePicture = profilePicture
         ? getPreviewImageUrl(profilePicture)
-        : existingProfilePicture 
+        : existingProfilePicture
             ? getImageUrl(existingProfilePicture)
             : null;
 
@@ -324,7 +326,6 @@ export const UpdateUserModal = ({ open, onClose, user }: UpdateUserModalProps) =
                                                             <span className="text-red-500">*</span>
                                                         </span>
                                                     }
-                                                    placeholder="Enter or select a role"
                                                     {...updateRegister("role")}
                                                     className="capitalize!"
                                                     invalid={!!errorsUpdate.role}
@@ -432,6 +433,34 @@ export const UpdateUserModal = ({ open, onClose, user }: UpdateUserModalProps) =
                                                 />
                                             </div>
                                         </div>
+
+                                        {/* Storefront Info Section */}
+                                        {user?.role?.name?.toLowerCase() !== "admin" && (
+                                            <div>
+                                                <h3 className="text-base font-semibold mb-4">Storefront Info</h3>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <TextInput
+                                                        id="update_rating"
+                                                        labelText="Rating"
+                                                        placeholder="0.0"
+                                                        type="number"
+                                                        step="0.1"
+                                                        {...updateRegister("rating")}
+                                                        invalid={!!errorsUpdate.rating}
+                                                        invalidText={errorsUpdate.rating?.message}
+                                                    />
+                                                    <TextInput
+                                                        id="update_total_reviews"
+                                                        labelText="Total Reviews"
+                                                        placeholder="0"
+                                                        type="number"
+                                                        {...updateRegister("total_reviews")}
+                                                        invalid={!!errorsUpdate.total_reviews}
+                                                        invalidText={errorsUpdate.total_reviews?.message}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -471,80 +500,80 @@ export const UpdateUserModal = ({ open, onClose, user }: UpdateUserModalProps) =
                                 </div>
                             </div>
                         </TabPanel>
-                    <TabPanel>
-                        <div className="flex flex-col gap-5">
-                            <PasswordInput
-                                id="old_password"
-                                labelText={
-                                    <span className="flex items-center gap-1">
-                                        Old Password
-                                        <Toggletip>
-                                            <ToggletipButton label="Show Information">
-                                                <Information />
-                                            </ToggletipButton>
-                                            <ToggletipContent>
-                                                <p>Enter your current password.</p>
-                                            </ToggletipContent>
-                                        </Toggletip>
-                                    </span>
-                                }
-                                size="md"
-                                placeholder="Enter password"
-                                required
-                                {...passRegister("old_password")}
-                                invalid={!!passError.old_password}
-                                invalidText={passError.old_password?.message}
-                            />
+                        <TabPanel>
+                            <div className="flex flex-col gap-5">
+                                <PasswordInput
+                                    id="old_password"
+                                    labelText={
+                                        <span className="flex items-center gap-1">
+                                            Old Password
+                                            <Toggletip>
+                                                <ToggletipButton label="Show Information">
+                                                    <Information />
+                                                </ToggletipButton>
+                                                <ToggletipContent>
+                                                    <p>Enter your current password.</p>
+                                                </ToggletipContent>
+                                            </Toggletip>
+                                        </span>
+                                    }
+                                    size="md"
+                                    placeholder="Enter password"
+                                    required
+                                    {...passRegister("old_password")}
+                                    invalid={!!passError.old_password}
+                                    invalidText={passError.old_password?.message}
+                                />
 
-                            <PasswordInput
-                                id="new_password"
-                                labelText={
-                                    <span className="flex items-center gap-1">
-                                        New Password
-                                        <Toggletip>
-                                            <ToggletipButton label="Show Information">
-                                                <Information />
-                                            </ToggletipButton>
-                                            <ToggletipContent>
-                                                <p>Create your new password.</p>
-                                            </ToggletipContent>
-                                        </Toggletip>
-                                    </span>
-                                }
-                                size="md"
-                                placeholder="Create password"
-                                required
-                                {...passRegister("new_password")}
-                                invalid={!!passError.new_password}
-                                invalidText={passError.new_password?.message}
-                            />
+                                <PasswordInput
+                                    id="new_password"
+                                    labelText={
+                                        <span className="flex items-center gap-1">
+                                            New Password
+                                            <Toggletip>
+                                                <ToggletipButton label="Show Information">
+                                                    <Information />
+                                                </ToggletipButton>
+                                                <ToggletipContent>
+                                                    <p>Create your new password.</p>
+                                                </ToggletipContent>
+                                            </Toggletip>
+                                        </span>
+                                    }
+                                    size="md"
+                                    placeholder="Create password"
+                                    required
+                                    {...passRegister("new_password")}
+                                    invalid={!!passError.new_password}
+                                    invalidText={passError.new_password?.message}
+                                />
 
-                            <PasswordInput
-                                id="change_confirm_password"
-                                labelText={
-                                    <span className="flex items-center gap-1">
-                                        Confirm Password
-                                        <Toggletip>
-                                            <ToggletipButton label="Show Information">
-                                                <Information />
-                                            </ToggletipButton>
-                                            <ToggletipContent>
-                                                <p>Re-enter your new password.</p>
-                                            </ToggletipContent>
-                                        </Toggletip>
-                                    </span>
-                                }
-                                size="md"
-                                placeholder="Confirm password"
-                                required
-                                {...passRegister("confirm_password")}
-                                invalid={!!passError.confirm_password}
-                                invalidText={passError.confirm_password?.message}
-                            />
-                        </div>
-                    </TabPanel>
-                </TabPanels>
-            </Tabs>
+                                <PasswordInput
+                                    id="change_confirm_password"
+                                    labelText={
+                                        <span className="flex items-center gap-1">
+                                            Confirm Password
+                                            <Toggletip>
+                                                <ToggletipButton label="Show Information">
+                                                    <Information />
+                                                </ToggletipButton>
+                                                <ToggletipContent>
+                                                    <p>Re-enter your new password.</p>
+                                                </ToggletipContent>
+                                            </Toggletip>
+                                        </span>
+                                    }
+                                    size="md"
+                                    placeholder="Confirm password"
+                                    required
+                                    {...passRegister("confirm_password")}
+                                    invalid={!!passError.confirm_password}
+                                    invalidText={passError.confirm_password?.message}
+                                />
+                            </div>
+                        </TabPanel>
+                    </TabPanels>
+                </Tabs>
             </ModalBody>
             <ModalFooter>
                 <Button kind="secondary" onClick={onClose}>
@@ -554,8 +583,8 @@ export const UpdateUserModal = ({ open, onClose, user }: UpdateUserModalProps) =
                     onClick={submitUpdates}
                     disabled={Updating || PasswordPending}
                 >
-                    {Updating || PasswordPending 
-                        ? (selectedTab === 0 ? 'Updating...' : 'Changing Password...') 
+                    {Updating || PasswordPending
+                        ? (selectedTab === 0 ? 'Updating...' : 'Changing Password...')
                         : (selectedTab === 0 ? 'Save changes' : 'Change Password')}
                 </Button>
             </ModalFooter>

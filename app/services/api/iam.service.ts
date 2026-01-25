@@ -47,7 +47,7 @@ export const createUser = async (payload: CreateUserSchema): Promise<ResponseTyp
   formData.append("password", payload.password);
   formData.append("confirm_password", payload.confirm_password);
   formData.append("role", payload.role);
-  
+
   if (payload.profile_picture) {
     formData.append("profile_picture", payload.profile_picture);
   }
@@ -65,6 +65,12 @@ export const createUser = async (payload: CreateUserSchema): Promise<ResponseTyp
   }
   if (payload.zip_postal_code) {
     formData.append("zip_postal_code", payload.zip_postal_code);
+  }
+  if (payload.rating !== undefined) {
+    formData.append("rating", String(payload.rating));
+  }
+  if (payload.total_reviews !== undefined) {
+    formData.append("total_reviews", String(payload.total_reviews));
   }
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_API}/user/`, {
@@ -96,7 +102,7 @@ export const updateUser = async ({
   formData.append("last_name", payload.last_name);
   formData.append("email", payload.email);
   formData.append("role", payload.role);
-  
+
   if (payload.profile_picture) {
     formData.append("profile_picture", payload.profile_picture);
   }
@@ -117,6 +123,12 @@ export const updateUser = async ({
   }
   if (payload.zip_postal_code) {
     formData.append("zip_postal_code", payload.zip_postal_code);
+  }
+  if (payload.rating !== undefined) {
+    formData.append("rating", String(payload.rating));
+  }
+  if (payload.total_reviews !== undefined) {
+    formData.append("total_reviews", String(payload.total_reviews));
   }
 
   const response = await fetch(`${process.env.NEXT_PUBLIC_API}/user/${id}`, {

@@ -11,6 +11,10 @@ export interface User {
   street_address_1?: string;
   street_address_2?: string;
   zip_postal_code?: string;
+  phone?: string;
+  identity_verified?: boolean;
+  rating?: number;
+  total_reviews?: number;
   role?: Role;
   created_at?: string;
   updated_at?: string;

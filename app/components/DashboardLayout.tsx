@@ -10,6 +10,7 @@ import {
   VehicleApi,
   User,
   ArrowRight,
+  Chat,
 } from "@carbon/icons-react";
 import {
   Header,
@@ -231,6 +232,13 @@ export const DashboardLayout = ({
                       isActive={pathname === "/dashboard/role"}
                     >
                       Role
+                    </SideNavMenuItem>
+                    <SideNavMenuItem
+                      as={Link}
+                      href="/dashboard/message"
+                      isActive={pathname === "/dashboard/message"}
+                    >
+                      Messages
                     </SideNavMenuItem>
                   </SideNavMenu>
                   <SideNavMenu renderIcon={Product} title="Products" large>

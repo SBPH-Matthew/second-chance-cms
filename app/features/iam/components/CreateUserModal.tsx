@@ -56,7 +56,7 @@ export const CreateUserModal = ({ open, onClose }: CreateUserModalProps) => {
         setValue,
         watch,
     } = useForm<CreateUserSchema>({
-        resolver: zodResolver(createUserSchema),
+        resolver: zodResolver(createUserSchema) as any,
         mode: "onSubmit",
     });
 
@@ -324,6 +324,34 @@ export const CreateUserModal = ({ open, onClose }: CreateUserModalProps) => {
                                     />
                                 </div>
                             </div>
+
+                            {/* Storefront Info Section */}
+                            {watchedValues.role && getRoles?.roles.items.find(r => String(r.id) === watchedValues.role)?.name.toLowerCase() !== "admin" && (
+                                <div>
+                                    <h3 className="text-base font-semibold mb-4">Storefront Info</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <TextInput
+                                            id="rating"
+                                            labelText="Rating"
+                                            placeholder="0.0"
+                                            type="number"
+                                            step="0.1"
+                                            {...register("rating")}
+                                            invalid={!!errors.rating}
+                                            invalidText={errors.rating?.message}
+                                        />
+                                        <TextInput
+                                            id="total_reviews"
+                                            labelText="Total Reviews"
+                                            placeholder="0"
+                                            type="number"
+                                            {...register("total_reviews")}
+                                            invalid={!!errors.total_reviews}
+                                            invalidText={errors.total_reviews?.message}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </Form>
                     </div>
 
@@ -371,7 +399,7 @@ export const CreateUserModal = ({ open, onClose }: CreateUserModalProps) => {
                     Cancel
                 </Button>
                 <Button
-                    onClick={handleSubmit(handlePayload)}
+                    onClick={handleSubmit(handlePayload as any)}
                     disabled={Creating}
                 >
                     {Creating ? 'Creating...' : 'Create'}

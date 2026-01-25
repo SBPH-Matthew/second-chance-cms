@@ -26,6 +26,7 @@ import {
   UpdateUserModal,
   DeleteUserModal,
 } from "./components";
+import { SendMessageModal } from "../message/components/SendMessageModal";
 import { useDebounce } from "@/app/hooks/useDebounce";
 
 export const Users = () => {
@@ -35,6 +36,7 @@ export const Users = () => {
   const [open, setOpen] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+  const [openMessage, setOpenMessage] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   // Track if we've loaded data at least once (for initial skeleton only)
@@ -78,6 +80,12 @@ export const Users = () => {
     if (!id && openDelete) setSelectedUserId(null);
   };
 
+  const handleOpenMessage = (id?: number) => {
+    if (id) setSelectedUserId(id);
+    setOpenMessage((prev) => !prev);
+    if (!id && openMessage) setSelectedUserId(null);
+  };
+
   // Find the selected user object from the paginated list
   const selectedUser =
     paginateUser?.users.items.find((u) => u.id === selectedUserId) || null;
@@ -104,6 +112,15 @@ export const Users = () => {
         id={selectedUserId}
       />
 
+      <SendMessageModal
+        open={openMessage}
+        onClose={() => {
+          setOpenMessage(false);
+          setSelectedUserId(null);
+        }}
+        recipient={selectedUser}
+      />
+
       {loadingPaginateUsers && !hasLoadedDataRef.current ? (
         <DataTableSkeleton
           aria-label="User tables"
@@ -112,6 +129,8 @@ export const Users = () => {
             { header: "Name", key: "name" },
             { header: "Email", key: "email" },
             { header: "Role", key: "role" },
+            { header: "Rating", key: "rating" },
+            { header: "Reviews", key: "total_reviews" },
             { header: "Actions", key: "actions" },
           ]}
           showHeader
@@ -147,13 +166,15 @@ export const Users = () => {
                 <TableHeader>Name</TableHeader>
                 <TableHeader>Email</TableHeader>
                 <TableHeader>Role</TableHeader>
+                <TableHeader>Rating</TableHeader>
+                <TableHeader>Reviews</TableHeader>
                 <TableHeader>Actions</TableHeader>
               </TableRow>
             </TableHead>
             <TableBody>
               {isEmpty ? (
                 <TableRow>
-                  <TableCell colSpan={5}>
+                  <TableCell colSpan={7}>
                     <div className="flex flex-col items-start justify-center gap-4 ps-5! py-5!">
                       {isEmptyWithSearch ? (
                         <>
@@ -240,6 +261,8 @@ export const Users = () => {
                       <TableCell className="capitalize">
                         {user.role?.name || "N/A"}
                       </TableCell>
+                      <TableCell>{user.rating ?? 0}</TableCell>
+                      <TableCell>{user.total_reviews ?? 0}</TableCell>
                       <TableCell>
                         <OverflowMenu
                           aria-label="actions"
@@ -249,6 +272,10 @@ export const Users = () => {
                           <OverflowMenuItem
                             onClick={() => handleOpenUpdate(user.id)}
                             itemText="Edit"
+                          />
+                          <OverflowMenuItem
+                            onClick={() => handleOpenMessage(user.id)}
+                            itemText="Message"
                           />
                           <OverflowMenuItem
                             itemText="Delete"

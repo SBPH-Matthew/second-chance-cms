@@ -24,6 +24,8 @@ export const createUserSchema = z
         street_address_1: z.string().optional(),
         street_address_2: z.string().optional(),
         zip_postal_code: z.string().optional(),
+        rating: z.coerce.number().optional().default(0),
+        total_reviews: z.coerce.number().optional().default(0),
     })
     .refine((data) => data.password === data.confirm_password, {
         message: "Passwords do not match.",
@@ -44,6 +46,8 @@ export const updateUserSchema = z.object({
     street_address_1: z.string().optional(),
     street_address_2: z.string().optional(),
     zip_postal_code: z.string().optional(),
+    rating: z.coerce.number().optional(),
+    total_reviews: z.coerce.number().optional(),
 });
 
 export type UpdateUserSchema = z.infer<typeof updateUserSchema>;
@@ -68,4 +72,4 @@ export const updateUserPassword = z
         path: ["confirm_password"],
     });
 
-export type UpdateUserPasswordSchema = z.Infer<typeof updateUserPassword>;
+export type UpdateUserPasswordSchema = z.infer<typeof updateUserPassword>;
