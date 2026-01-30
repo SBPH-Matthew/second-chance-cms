@@ -24,6 +24,10 @@ export const createUserSchema = z
         street_address_1: z.string().optional(),
         street_address_2: z.string().optional(),
         zip_postal_code: z.string().optional(),
+        phone: z.string().optional(),
+        bio: z.string().optional(),
+        identity_verified: z.boolean().optional().default(false),
+        id_document: z.instanceof(File).optional(),
         rating: z.coerce.number().optional().default(0),
         total_reviews: z.coerce.number().optional().default(0),
     })
@@ -46,6 +50,11 @@ export const updateUserSchema = z.object({
     street_address_1: z.string().optional(),
     street_address_2: z.string().optional(),
     zip_postal_code: z.string().optional(),
+    phone: z.string().optional(),
+    bio: z.string().optional(),
+    identity_verified: z.boolean().optional(),
+    id_document: z.instanceof(File).optional(),
+    existing_id_document: z.string().optional(),
     rating: z.coerce.number().optional(),
     total_reviews: z.coerce.number().optional(),
 });

@@ -1,5 +1,6 @@
 import {
   CreateUserSchema,
+  GetUserByIdResponse,
   PaginateUsersResponse,
   UpdateUserPasswordSchema,
   UpdateUserSchema,
@@ -11,6 +12,31 @@ export interface PaginateUserParams {
   limit: number;
   signal?: AbortSignal;
 }
+
+export const getUserById = async ({
+  id,
+  signal,
+}: {
+  id: number;
+  signal?: AbortSignal;
+}): Promise<GetUserByIdResponse> => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API}/user/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    signal,
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw data;
+  }
+
+  return data;
+};
 
 export const paginateUser = async ({
   page,
@@ -65,6 +91,18 @@ export const createUser = async (payload: CreateUserSchema): Promise<ResponseTyp
   }
   if (payload.zip_postal_code) {
     formData.append("zip_postal_code", payload.zip_postal_code);
+  }
+  if (payload.phone) {
+    formData.append("phone", payload.phone);
+  }
+  if (payload.bio) {
+    formData.append("bio", payload.bio);
+  }
+  if (payload.identity_verified !== undefined) {
+    formData.append("identity_verified", String(payload.identity_verified));
+  }
+  if (payload.id_document) {
+    formData.append("id_document", payload.id_document);
   }
   if (payload.rating !== undefined) {
     formData.append("rating", String(payload.rating));
@@ -123,6 +161,21 @@ export const updateUser = async ({
   }
   if (payload.zip_postal_code) {
     formData.append("zip_postal_code", payload.zip_postal_code);
+  }
+  if (payload.phone) {
+    formData.append("phone", payload.phone);
+  }
+  if (payload.bio) {
+    formData.append("bio", payload.bio);
+  }
+  if (payload.identity_verified !== undefined) {
+    formData.append("identity_verified", String(payload.identity_verified));
+  }
+  if (payload.id_document) {
+    formData.append("id_document", payload.id_document);
+  }
+  if (payload.existing_id_document) {
+    formData.append("existing_id_document", payload.existing_id_document);
   }
   if (payload.rating !== undefined) {
     formData.append("rating", String(payload.rating));

@@ -11,3 +11,11 @@ export interface PaginateUsersResponse extends ResponseType {
     items: User[];
   };
 }
+
+export interface GetUserByIdResponse extends ResponseType {
+  user: User;
+}
+
+export interface GetUserByIdResponse extends ResponseType {
+  user: User;
+}

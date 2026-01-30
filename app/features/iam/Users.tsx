@@ -21,22 +21,19 @@ import {
 } from "@carbon/react";
 import { useGetPaginateUser } from "./hooks/useIam";
 import { useState, useRef, useEffect } from "react";
-import {
-  CreateUserModal,
-  UpdateUserModal,
-  DeleteUserModal,
-} from "./components";
+import { DeleteUserModal, VerifyUserModal } from "./components";
 import { SendMessageModal } from "../message/components/SendMessageModal";
 import { useDebounce } from "@/app/hooks/useDebounce";
+import { useRouter } from "next/navigation";
 
 export const Users = () => {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState("");
-  const [open, setOpen] = useState(false);
-  const [openUpdate, setOpenUpdate] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [openMessage, setOpenMessage] = useState(false);
+  const [openVerify, setOpenVerify] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   // Track if we've loaded data at least once (for initial skeleton only)
@@ -66,12 +63,12 @@ export const Users = () => {
   const hasSearch = debouncedSearch && debouncedSearch.trim() !== "";
   const isEmptyWithSearch = isEmpty && hasSearch;
 
-  const handleOpen = () => setOpen((prev) => !prev);
+  const handleOpen = () => router.push("/dashboard/user/new");
 
   const handleOpenUpdate = (id?: number) => {
-    if (id) setSelectedUserId(id);
-    setOpenUpdate((prev) => !prev);
-    if (!id && openUpdate) setSelectedUserId(null);
+    if (id) {
+      router.push(`/dashboard/user/${id}/edit`);
+    }
   };
 
   const handleOpenDelete = (id?: number) => {
@@ -86,23 +83,18 @@ export const Users = () => {
     if (!id && openMessage) setSelectedUserId(null);
   };
 
+  const handleOpenVerify = (id?: number) => {
+    if (id) setSelectedUserId(id);
+    setOpenVerify((prev) => !prev);
+    if (!id && openVerify) setSelectedUserId(null);
+  };
+
   // Find the selected user object from the paginated list
   const selectedUser =
     paginateUser?.users.items.find((u) => u.id === selectedUserId) || null;
 
   return (
     <section className="min-h-full!">
-      <CreateUserModal open={open} onClose={() => setOpen(false)} />
-
-      <UpdateUserModal
-        open={openUpdate}
-        onClose={() => {
-          setOpenUpdate(false);
-          setSelectedUserId(null);
-        }}
-        user={selectedUser}
-      />
-
       <DeleteUserModal
         open={openDelete}
         onClose={() => {
@@ -119,6 +111,15 @@ export const Users = () => {
           setSelectedUserId(null);
         }}
         recipient={selectedUser}
+      />
+
+      <VerifyUserModal
+        open={openVerify}
+        onClose={() => {
+          setOpenVerify(false);
+          setSelectedUserId(null);
+        }}
+        userId={selectedUserId}
       />
 
       {loadingPaginateUsers && !hasLoadedDataRef.current ? (
@@ -186,10 +187,7 @@ export const Users = () => {
                             Try adjusting your search terms or clear the search
                             to see all users.
                           </p>
-                          <Button
-                            kind="ghost"
-                            onClick={() => setSearch("")}
-                          >
+                          <Button kind="ghost" onClick={() => setSearch("")}>
                             Clear search
                           </Button>
                         </>
@@ -212,16 +210,16 @@ export const Users = () => {
               ) : (
                 paginateUser?.users.items.map((user) => {
                   const getImageUrl = (imagePath: string) => {
-                    if (imagePath.startsWith('http')) {
+                    if (imagePath.startsWith("http")) {
                       return imagePath;
                     }
-                    const apiUrl = process.env.NEXT_PUBLIC_API || '';
+                    const apiUrl = process.env.NEXT_PUBLIC_API || "";
                     return `${apiUrl}${imagePath}`;
                   };
 
                   const getInitials = (firstName: string, lastName: string) => {
-                    const first = firstName?.charAt(0)?.toUpperCase() || '';
-                    const last = lastName?.charAt(0)?.toUpperCase() || '';
+                    const first = firstName?.charAt(0)?.toUpperCase() || "";
+                    const last = lastName?.charAt(0)?.toUpperCase() || "";
                     return `${first}${last}`;
                   };
 
@@ -236,13 +234,19 @@ export const Users = () => {
                             onError={(e) => {
                               // Fallback to User icon if image fails to load
                               const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
+                              target.style.display = "none";
                               const parent = target.parentElement;
-                              if (parent && !parent.querySelector('.avatar-fallback')) {
-                                const fallbackDiv = document.createElement('div');
-                                fallbackDiv.className = 'avatar-fallback w-10 h-10 rounded-full bg-[#393939] flex items-center justify-center p-2';
-                                const userIcon = document.createElement('div');
-                                userIcon.innerHTML = '<svg width="20" height="20" viewBox="0 0 32 32" fill="currentColor"><path d="M16 8a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3z"/><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26a12 12 0 0 1-10.29-5.79l5.71-5.71a2 2 0 0 1 2.83 0l5.71 5.71A12 12 0 0 1 16 28zm0-24a12 12 0 0 1 10.29 18.79l-5.71-5.71a2 2 0 0 0-2.83 0l-5.71 5.71A12 12 0 0 1 16 4z"/></svg>';
+                              if (
+                                parent &&
+                                !parent.querySelector(".avatar-fallback")
+                              ) {
+                                const fallbackDiv =
+                                  document.createElement("div");
+                                fallbackDiv.className =
+                                  "avatar-fallback w-10 h-10 rounded-full bg-[#393939] flex items-center justify-center p-2";
+                                const userIcon = document.createElement("div");
+                                userIcon.innerHTML =
+                                  '<svg width="20" height="20" viewBox="0 0 32 32" fill="currentColor"><path d="M16 8a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3z"/><path d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm0 26a12 12 0 0 1-10.29-5.79l5.71-5.71a2 2 0 0 1 2.83 0l5.71 5.71A12 12 0 0 1 16 28zm0-24a12 12 0 0 1 10.29 18.79l-5.71-5.71a2 2 0 0 0-2.83 0l-5.71 5.71A12 12 0 0 1 16 4z"/></svg>';
                                 fallbackDiv.appendChild(userIcon);
                                 parent.appendChild(fallbackDiv);
                               }
@@ -276,6 +280,11 @@ export const Users = () => {
                           <OverflowMenuItem
                             onClick={() => handleOpenMessage(user.id)}
                             itemText="Message"
+                          />
+                          <OverflowMenuItem
+                            onClick={() => handleOpenVerify(user.id)}
+                            itemText="Verify"
+                            disabled={user.identity_verified}
                           />
                           <OverflowMenuItem
                             itemText="Delete"

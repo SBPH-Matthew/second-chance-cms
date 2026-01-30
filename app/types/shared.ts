@@ -12,7 +12,9 @@ export interface User {
   street_address_2?: string;
   zip_postal_code?: string;
   phone?: string;
+  bio?: string;
   identity_verified?: boolean;
+  id_document?: string;
   rating?: number;
   total_reviews?: number;
   role?: Role;

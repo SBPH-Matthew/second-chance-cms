@@ -2,12 +2,14 @@ import {
   changePassword,
   createUser,
   deleteUser,
+  getUserById,
   paginateUser,
   PaginateUserParams,
   updateUser,
 } from "@/app/services";
 import {
   CreateUserSchema,
+  GetUserByIdResponse,
   ResponseType,
   UpdateUserPasswordSchema,
   UpdateUserSchema,
@@ -16,6 +18,17 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 type PageUserParams = Omit<PaginateUserParams, "signal">;
+
+export const useGetUserById = (id?: number) => {
+  const { data, isPending, error } = useQuery<GetUserByIdResponse>({
+    queryKey: ["user", id],
+    queryFn: ({ signal }) => getUserById({ id: id as number, signal }),
+    enabled: typeof id === "number" && id > 0,
+  });
+
+  return { data, isPending, error };
+};
+
 export const useGetPaginateUser = ({ page, limit }: PageUserParams) => {
   const { data, isPending, error } = useQuery({
     queryKey: ["paginate-users", page, limit],
